@@ -18,4 +18,14 @@ describe('Prisma Client', () => {
             expect(error).toBeUndefined(); // Fail the test if there's an error
         }
     });
+
+    test('Prisma Client should handle disconnection gracefully', async () => {
+        try {
+            await prisma.$connect();
+            await prisma.$disconnect();
+            expect(true).toBe(true); // If no error, disconnection is successful
+        } catch (error) {
+            expect(error).toBeUndefined(); // Fail the test if there's an error
+        }
+    });
 });
