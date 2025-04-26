@@ -1,0 +1,50 @@
+name: Build and Test on Ubuntu
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build-and-test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+            path: /tmp/.buildx-cache
+            key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package.json', '**/package-lock.json', '**/.env.example') }}
+            restore-keys: |
+                ${{ runner.os }}-buildx-
+
+      - name: Build Docker image with buildx
+        uses: docker/build-push-action@v6
+        with:
+            context: .
+            file: ./Dockerfile
+            builder: ${{ steps.buildx.outputs.name }}
+            load: true
+            cache-from: type=local,src=/tmp/.buildx-cache
+            cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Create .env file
+        run: cp .env.example .env
+
+      - name: Run tests
+        run: |
+          docker compose --profile dev -f docker-compose.yml up -d
+          CONTAINER_NAME=$(docker compose ps -q api)
+          docker exec $CONTAINER_NAME npm test
+
+      - name: Clean up Docker containers
+        run: |
+          docker compose -f docker-compose.yml down
