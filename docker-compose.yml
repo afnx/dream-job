@@ -11,8 +11,6 @@ services:
       - NODE_ENV=development
     env_file:
       - .env
-    depends_on:
-      - db
   db:
     image: postgres:latest
     restart: always
@@ -24,6 +22,8 @@ services:
       POSTGRES_DB: dream_job_db
     volumes:
       - db_data:/var/lib/postgresql/data
+    profiles:
+      - dev # Only run this service in development mode.
 
 volumes:
   node_modules:
