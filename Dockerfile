@@ -19,8 +19,5 @@ COPY . .
 # This script is used to start the server
 RUN chmod +x ./entrypoint.sh
 
-# Expose the port your app runs on
-EXPOSE 5000
-
 # Start the server using the entrypoint script
 ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
