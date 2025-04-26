@@ -39,9 +39,19 @@ jobs:
       - name: Create .env file
         run: cp .env.example .env
 
-      - name: Run tests
+      - name: Start services
         run: |
           docker compose --profile dev -f docker-compose.yml up -d
+          
+      - name: Wait for database to be ready
+        run: |
+          until docker exec $(docker compose ps -q db) nc -z $DATABASE_HOST $DATABASE_PORT; do
+            echo "Waiting for database..."
+            sleep 5
+          done
+
+      - name: Run tests
+        run: |
           CONTAINER_NAME=$(docker compose ps -q api)
           docker exec $CONTAINER_NAME npm test
 
