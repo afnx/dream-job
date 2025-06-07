@@ -22,7 +22,8 @@ jobs:
         uses: actions/cache@v4
         with:
             path: /tmp/.buildx-cache
-            key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/backend/package.json', '**/backend/package-lock.json', '**/.env.example') }}
+
+            key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package.json', '**/package-lock.json', '**/.env.example') }}
             restore-keys: |
                 ${{ runner.os }}-buildx-
 
@@ -52,6 +53,7 @@ jobs:
 
       - name: Run tests
         run: |
+
           CONTAINER_NAME=$(docker compose ps -q backend)
           docker exec $CONTAINER_NAME npm test
 
