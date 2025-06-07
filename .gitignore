@@ -3,7 +3,7 @@ node_modules/
 npm-debug.log*
 
 # Prisma generated files
-prisma/generated/
+backend/prisma/generated/
 
 # Logs
 logs/
