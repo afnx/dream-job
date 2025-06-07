@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-test:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     
     steps:
@@ -22,15 +22,16 @@ jobs:
         uses: actions/cache@v4
         with:
             path: /tmp/.buildx-cache
+
             key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package.json', '**/package-lock.json', '**/.env.example') }}
             restore-keys: |
                 ${{ runner.os }}-buildx-
 
-      - name: Build Docker image with buildx
+      - name: Build backend Docker image with buildx
         uses: docker/build-push-action@v6
         with:
-            context: .
-            file: ./Dockerfile
+            context: ./backend
+            file: ./backend/Dockerfile
             builder: ${{ steps.buildx.outputs.name }}
             load: true
             cache-from: type=local,src=/tmp/.buildx-cache
@@ -52,7 +53,8 @@ jobs:
 
       - name: Run tests
         run: |
-          CONTAINER_NAME=$(docker compose ps -q api)
+
+          CONTAINER_NAME=$(docker compose ps -q backend)
           docker exec $CONTAINER_NAME npm test
 
       - name: Clean up Docker containers

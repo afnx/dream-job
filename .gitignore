@@ -2,6 +2,9 @@
 node_modules/
 npm-debug.log*
 
+# Prisma generated files
+backend/prisma/generated/
+
 # Logs
 logs/
 *.log
