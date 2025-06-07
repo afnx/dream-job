@@ -1,0 +1,29 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "${NODE_PORT}:${NODE_PORT}"
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    env_file:
+      - .env
+  db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    profiles:
+      - dev # Only run this service in development mode.
+
+volumes:
+  backend_node_modules:
+  db_data:
