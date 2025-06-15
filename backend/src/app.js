@@ -1,18 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
+const env = require('./config/env');
 
 const app = express();
 
 // Allow only requests from react app
 const corsOptions = {
-    origin: 'http://localhost:3000', // TODO: Update with the actual React app URL
+    origin: env.frontend.url,
     methods: 'GET,POST,PUT,DELETE',
     credentials: true,
 };
 
 // Enable CORS for all routes
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -20,6 +21,6 @@ app.get('/', (req, res) => {
 });
 
 // Use centralized routes
-app.use('/api', routes);
+app.use(env.apiPrefix, routes);
 
 module.exports = app;
