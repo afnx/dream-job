@@ -1,15 +1,31 @@
 const OpenAIClient = require("./openai-client");
-const env = require("../config/env");
 
-function getAIClient() {
-    const provider = (env.ai.provider || "").toLowerCase();
 
-    switch (provider) {
-        case "openai":
-            return new OpenAIClient();
-        default:
-            throw new Error(`Unsupported AI provider: ${provider}`);
+class AIService {
+    /**
+    * Service class for managing AI provider clients.
+    *
+    * @class
+    * @param {Object} config - Configuration object for the AI service.
+    * @param {string} config.provider - The name of the AI provider (e.g., "openai").
+    */
+    constructor(config) {
+        if (!config || !config.provider) {
+            throw new Error("AIService is not configured properly. Please provide a provider.");
+        }
+        this.config = config;
+        this.aiProvider = (this.config.provider || "").toLowerCase();
     }
+
+    getAIClient() {
+        switch (this.aiProvider) {
+            case "openai":
+                return new OpenAIClient(this.config);
+            default:
+                throw new Error(`Unsupported AI provider: ${provider}`);
+        }
+    }
+
 }
 
-module.exports = { getAIClient };
+module.exports = AIService;

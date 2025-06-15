@@ -1,13 +1,24 @@
 const { OpenAI } = require("openai");
 const AIClient = require("./ai-client");
-const env = require("../config/env");
 
 class OpenAIClient extends AIClient {
-    constructor() {
+    /**
+    * OpenClient Service for interacting with OpenAI's API.
+    * @param {object} config - Configuration specific to OpenAI (e.g., apiKey, model).
+    * @param {string} config.apiKey - The API key for OpenAI.
+    * @param {string} config.model - The model to use for OpenAI requests (e.g., "gpt-3.5-turbo").
+    */
+    constructor(config) {
         super();
+        if (!config || !config.apiKey || !config.model) {
+            throw new Error("OpenAIClient is not configured properly. Please provide apiKey and model.");
+        }
+
+        this.model = config.model;
         this.openai = new OpenAI({
-            apiKey: env.ai.apiKey || process.env.OPENAI_API_KEY,
+            apiKey: config.apiKey,
         });
+
     }
 
     async extractJobQueryDetails(userInput) {
@@ -22,7 +33,7 @@ class OpenAIClient extends AIClient {
             }`;
 
             const response = await this.openai.chat.completions.create({
-                model: env.ai.model,
+                model: this.model,
                 messages: [{ role: "user", content: prompt }],
                 max_tokens: 500,
                 temperature: 0.3,
@@ -63,7 +74,7 @@ class OpenAIClient extends AIClient {
             } else if (error.code === 'invalid_api_key') {
                 throw new Error('Invalid OpenAI API key. Please check your configuration.');
             } else if (error.code === 'model_not_found') {
-                throw new Error(`Model '${env.ai.model}' not found. Please check your model configuration.`);
+                throw new Error(`Model '${this.model}' not found. Please check your model configuration.`);
             } else if (error.code === 'rate_limit_exceeded') {
                 throw new Error('OpenAI rate limit exceeded. Please try again later.');
             } else if (error.name === 'AbortError') {
@@ -102,7 +113,7 @@ class OpenAIClient extends AIClient {
                 ]`;
 
             const response = await this.openai.chat.completions.create({
-                model: env.ai.model,
+                model: this.model,
                 messages: [{ role: "user", content: prompt }],
                 max_tokens: 1500,
                 temperature: 0.3,
@@ -150,7 +161,7 @@ class OpenAIClient extends AIClient {
             } else if (error.code === 'invalid_api_key') {
                 throw new Error('Invalid OpenAI API key. Please check your configuration.');
             } else if (error.code === 'model_not_found') {
-                throw new Error(`Model '${env.ai.model}' not found. Please check your model configuration.`);
+                throw new Error(`Model '${this.model}' not found. Please check your model configuration.`);
             } else if (error.code === 'rate_limit_exceeded') {
                 throw new Error('OpenAI rate limit exceeded. Please try again later.');
             } else if (error.code === 'context_length_exceeded') {
