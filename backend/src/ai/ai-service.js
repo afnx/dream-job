@@ -1,4 +1,4 @@
-const OpenAIClient = require("./openAIClient");
+const OpenAIClient = require("./openai-client");
 const env = require("../config/env");
 
 function getAIClient() {
