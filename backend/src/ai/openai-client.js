@@ -1,5 +1,5 @@
 const { OpenAI } = require("openai");
-const AIClient = require("./aiClient");
+const AIClient = require("./ai-client");
 const env = require("../config/env");
 
 class OpenAIClient extends AIClient {
