@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y netcat-openbsd openssl
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+
+# Clear npm cache and install dependencies
+RUN npm cache clean --force && npm install
 
 # Copy the rest of the source code
 COPY . .
