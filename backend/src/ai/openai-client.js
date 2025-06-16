@@ -9,7 +9,7 @@ class OpenAIClient extends AIClient {
     * @param {string} config.model - The model to use for OpenAI requests (e.g., "gpt-3.5-turbo").
     */
     constructor(config) {
-        super();
+        super(config);
         if (!config || !config.apiKey || !config.model) {
             throw new Error("OpenAIClient is not configured properly. Please provide apiKey and model.");
         }
