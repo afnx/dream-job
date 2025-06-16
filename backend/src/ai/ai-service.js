@@ -22,7 +22,7 @@ class AIService {
             case "openai":
                 return new OpenAIClient(this.config);
             default:
-                throw new Error(`Unsupported AI provider: ${provider}`);
+                throw new Error(`Unsupported AI provider: ${this.aiProvider}`);
         }
     }
 
