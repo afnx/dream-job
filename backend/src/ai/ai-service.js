@@ -1,6 +1,5 @@
 const OpenAIClient = require("./openai-client");
 
-
 class AIService {
     /**
     * Service class for managing AI provider clients.
@@ -17,6 +16,10 @@ class AIService {
         this.aiProvider = (this.config.provider || "").toLowerCase();
     }
 
+    /**
+    * Get the appropriate AI client based on the configured provider
+    * @returns {import('./ai-client')} The AI client instance
+    */
     getAIClient() {
         switch (this.aiProvider) {
             case "openai":
