@@ -50,7 +50,7 @@ class BaseRepository {
                 ...options
             });
         } catch (error) {
-            throw new Error(`Error finding ${this.model}: ${error.message}`);
+            throw new Error(`Error finding first ${this.model}: ${error.message}`);
         }
     }
 
@@ -70,7 +70,7 @@ class BaseRepository {
                 ...options
             });
         } catch (error) {
-            throw new Error(`Error finding ${this.model}s: ${error.message}`);
+            throw new Error(`Error finding many ${this.model}s: ${error.message}`);
         }
     }
 
