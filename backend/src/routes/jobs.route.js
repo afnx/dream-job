@@ -1,10 +1,10 @@
 const express = require('express');
 const { validateUserInput } = require('../middleware/validate-input');
-const { getJobs } = require('../controllers/jobs.controller');
+const { searchJobs } = require('../controllers/jobs.controller');
 
 const router = express.Router();
 
 // POST /api/jobs/parse
-router.post("/parse", validateUserInput, getJobs);
+router.post("/parse", validateUserInput, searchJobs);
 
 module.exports = router;
