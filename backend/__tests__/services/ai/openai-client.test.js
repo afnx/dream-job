@@ -1,4 +1,5 @@
-const OpenAIClient = require('../../src/ai/openai-client');
+const e = require('express');
+const OpenAIClient = require('../../../src/services/ai/openai-client');
 const { OpenAI } = require('openai');
 
 // Mock the OpenAI SDK
@@ -77,7 +78,13 @@ describe('OpenAIClient', () => {
                         content: JSON.stringify({
                             keywords: ['javascript', 'developer'],
                             location: 'Remote',
-                            preferences: 'full-time'
+                            experience: 'mid-level',
+                            salaryMin: 50000,
+                            salaryMax: 100000,
+                            salaryCurrency: 'USD',
+                            jobType: 'full-time',
+                            remoteOption: 'remote',
+                            otherPreferences: ['flexible hours', 'health benefits']
                         })
                     }
                 }]
@@ -85,23 +92,29 @@ describe('OpenAIClient', () => {
 
             mockChatCompletions.create.mockResolvedValue(mockResponse);
 
-            const result = await client.extractJobQueryDetails('Looking for a JavaScript developer job remotely');
+            const result = await client.extractJobQueryDetails('Looking for a JavaScript developer job remotely with flexible hours and health benefits. Salary range: 50k-100k. Experience level: mid-level. Job type: full-time. Remote option: remote.');
 
             expect(result).toEqual({
                 keywords: ['javascript', 'developer'],
                 location: 'Remote',
-                preferences: 'full-time'
+                experience: 'mid-level',
+                salaryMin: 50000,
+                salaryMax: 100000,
+                salaryCurrency: 'USD',
+                jobType: 'full-time',
+                remoteOption: 'remote',
+                otherPreferences: ['flexible hours', 'health benefits']
             });
 
             expect(mockChatCompletions.create).toHaveBeenCalledWith({
                 model: 'gpt-3.5-turbo',
-                messages: [{ role: 'user', content: expect.stringContaining('Looking for a JavaScript developer job remotely') }],
+                messages: [{ role: 'user', content: expect.stringContaining('Looking for a JavaScript developer job remotely with flexible hours and health benefits. Salary range: 50k-100k. Experience level: mid-level. Job type: full-time. Remote option: remote.') }],
                 max_tokens: 500,
                 temperature: 0.3
             });
         });
 
-        it('should handle response with missing fields and provide defaults', async () => {
+        it('should handle response with missing fields', async () => {
             const mockResponse = {
                 choices: [{
                     message: {
@@ -119,32 +132,14 @@ describe('OpenAIClient', () => {
 
             expect(result).toEqual({
                 keywords: ['developer'],
-                location: '',
-                preferences: ''
-            });
-        });
-
-        it('should handle response with invalid field types and provide defaults', async () => {
-            const mockResponse = {
-                choices: [{
-                    message: {
-                        content: JSON.stringify({
-                            keywords: 'not-an-array',
-                            location: 123,
-                            preferences: null
-                        })
-                    }
-                }]
-            };
-
-            mockChatCompletions.create.mockResolvedValue(mockResponse);
-
-            const result = await client.extractJobQueryDetails('Test input');
-
-            expect(result).toEqual({
-                keywords: [],
-                location: '',
-                preferences: ''
+                location: undefined,
+                experience: undefined,
+                salaryMin: undefined,
+                salaryMax: undefined,
+                salaryCurrency: undefined,
+                jobType: undefined,
+                remoteOption: undefined,
+                otherPreferences: undefined
             });
         });
 

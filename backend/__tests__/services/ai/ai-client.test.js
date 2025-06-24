@@ -1,4 +1,4 @@
-const AIClient = require('../../src/ai/ai-client'); // Adjust the path as necessary
+const AIClient = require('../../../src/services/ai/ai-client'); // Adjust the path as necessary
 
 // Mock concrete implementation for testing
 class MockAIClient extends AIClient {
@@ -13,7 +13,13 @@ class MockAIClient extends AIClient {
     return {
       keywords: ['software', 'engineer'],
       location: 'San Francisco',
-      preferences: 'remote'
+      experience: 'mid-level',
+      salaryMin: 80000,
+      salaryMax: 120000,
+      salaryCurrency: 'USD',
+      jobType: 'full-time',
+      remoteOption: 'remote',
+      otherPreferences: ['flexible hours', 'health benefits'],
     };
   }
 
@@ -86,15 +92,27 @@ describe('AIClient', () => {
 
     describe('extractJobQueryDetails', () => {
       test('should return object with required fields for valid input', async () => {
-        const userInput = 'Looking for software engineer jobs in San Francisco';
+        const userInput = 'Looking for software engineer jobs in San Francisco with mid-level experience and a salary between 80k and 120k. Full-time remote options preferred. Flexible hours and health benefits are a plus.';
         const result = await mockClient.extractJobQueryDetails(userInput);
 
         expect(result).toHaveProperty('keywords');
         expect(result).toHaveProperty('location');
-        expect(result).toHaveProperty('preferences');
+        expect(result).toHaveProperty('experience');
+        expect(result).toHaveProperty('salaryMin');
+        expect(result).toHaveProperty('salaryMax');
+        expect(result).toHaveProperty('salaryCurrency');
+        expect(result).toHaveProperty('jobType');
+        expect(result).toHaveProperty('remoteOption');
+        expect(result).toHaveProperty('otherPreferences');
         expect(Array.isArray(result.keywords)).toBe(true);
         expect(typeof result.location).toBe('string');
-        expect(typeof result.preferences).toBe('string');
+        expect(typeof result.experience).toBe('string');
+        expect(typeof result.salaryMin).toBe('number');
+        expect(typeof result.salaryMax).toBe('number');
+        expect(typeof result.salaryCurrency).toBe('string');
+        expect(typeof result.jobType).toBe('string');
+        expect(typeof result.remoteOption).toBe('string');
+        expect(Array.isArray(result.otherPreferences)).toBe(true);
       });
 
       test('should handle invalid input gracefully', async () => {
@@ -108,7 +126,13 @@ describe('AIClient', () => {
         expect(result).toMatchObject({
           keywords: expect.any(Array),
           location: expect.any(String),
-          preferences: expect.any(String)
+          experience: expect.any(String),
+          salaryMin: expect.any(Number),
+          salaryMax: expect.any(Number),
+          salaryCurrency: expect.any(String),
+          jobType: expect.any(String),
+          remoteOption: expect.any(String),
+          otherPreferences: expect.any(Array)
         });
       });
     });
@@ -191,7 +215,13 @@ describe('AIClient', () => {
         const extractResult = await client.extractJobQueryDetails('test query');
         expect(extractResult).toHaveProperty('keywords');
         expect(extractResult).toHaveProperty('location');
-        expect(extractResult).toHaveProperty('preferences');
+        expect(extractResult).toHaveProperty('experience');
+        expect(extractResult).toHaveProperty('salaryMin');
+        expect(extractResult).toHaveProperty('salaryMax');
+        expect(extractResult).toHaveProperty('salaryCurrency');
+        expect(extractResult).toHaveProperty('jobType');
+        expect(extractResult).toHaveProperty('remoteOption');
+        expect(extractResult).toHaveProperty('otherPreferences');
 
         // Test rankJobListings interface
         const rankResult = await client.rankJobListings(
