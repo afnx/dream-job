@@ -1,4 +1,4 @@
-const AIService = require('../ai/ai-service');
+const JobService = require('../services/job/job-service');
 const env = require('../config/env');
 
 /**
@@ -8,29 +8,20 @@ const env = require('../config/env');
  * @param {Object} res - Express response object
  * @returns {Object} Job search results or error response
  */
-exports.getJobs = async (req, res) => {
+exports.searchJobs = async (req, res) => {
     try {
         const { input } = req.body;
 
-        const aiService = new AIService(env.ai);
-        const aiClient = aiService.getAIClient();
+        const jobService = new JobService();
+        const jobs = await jobService.searchJobs(input);
 
-        // Extract job query details using AI
-        const aiResult = await aiClient.extractJobQueryDetails(input);
+        if (!Array.isArray(jobs) || jobs.length === 0) {
+            return res.status(404).json({ error: 'No jobs found matching the criteria.' });
+        }
 
-        // TODO: Integrate with DB and scraping logic here
-        // TODO: Fetch job listings from database or web scraper based on AI extracted query
-        // Example: const jobs = await getJobsFromDBOrScraper(aiResult);
-
-        // TODO: Save the AI extracted query to the database for future reference
-        // Example: await saveQueryToDB(aiResult);
-
-        // TODO: Rank job listings based on the AI extracted query
-        // Example: const rankedJobs = await aiClient.rankJobListings(aiResult, jobs);
-
-        res.status(200).json({ success: true, data: { aiResult } });
+        res.status(200).json({ data: jobs });
     } catch (err) {
-        console.error('Error in getJobs:', err);
+        console.error('Error in searching jobs:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

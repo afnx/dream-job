@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "generated/prisma/client"
+  provider        = "prisma-client-js"
+  output          = "generated/prisma/client"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -9,13 +10,72 @@ datasource db {
 }
 
 model Job {
+  id             Int           @id @default(autoincrement())
+  title          String
+  description    String?
+  company        Company?      @relation(fields: [companyId], references: [id])
+  companyId      Int?
+  location       String?
+  experience     Experience?
+  salaryMin      Int?
+  salaryMax      Int?
+  salaryRaw      String?
+  salaryCurrency String?
+  jobType        JobType?
+  remoteOption   RemoteOption?
+  postedAt       DateTime?
+  link           String
+  skills         String[]
+  benefits       String[]
+  expiresAt      DateTime?
+
+  source  String?
+  rawData Json?
+
+  searchVector Unsupported("tsvector")?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([searchVector], type: Gin)
+  @@index([jobType])
+  @@index([location])
+  @@index([postedAt])
+  @@map("jobs")
+}
+
+model Company {
   id          Int      @id @default(autoincrement())
-  title       String
-  company     String
-  location    String
-  description String
-  postDate    DateTime
-  link        String
-  rank        Float    @default(0.0)
+  name        String
+  description String?
+  location    String?
+  website     String?
+  logoUrl     String?
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  jobs Job[]
+
+  @@map("companies")
+}
+
+enum Experience {
+  ENTRY_LEVEL
+  MID_LEVEL
+  SENIOR_LEVEL
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  VOLUNTEER
+  FREELANCE
+}
+
+enum RemoteOption {
+  REMOTE
+  HYBRID
+  ONSITE
 }

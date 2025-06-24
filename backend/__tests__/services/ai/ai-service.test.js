@@ -1,8 +1,8 @@
-const AIService = require('../../src/ai/ai-service');
-const OpenAIClient = require('../../src/ai/openai-client');
+const AIService = require('../../../src/services/ai/ai-service');
+const OpenAIClient = require('../../../src/services/ai/openai-client');
 
 // Mock the OpenAIClient
-jest.mock('../../src/ai/openai-client');
+jest.mock('../../../src/services/ai/openai-client');
 
 describe('AIService', () => {
     beforeEach(() => {
