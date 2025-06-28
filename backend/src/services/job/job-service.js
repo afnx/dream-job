@@ -1,20 +1,22 @@
 const JobRepository = require('../../repositories/job-repository');
 const AIService = require('../ai/ai-service');
 const { normalizedJobQuery } = require('../../utils/normalizers');
+const { AppError, ERROR_TYPES } = require('../../utils/errors');
 
 /**
  * Service class for handling job operations.
  * Utilizes AI to extract and normalize job queries, and interacts with the job repository to fetch job listings.
  *
- * @class JobService
- * @constructor
+ * @class
+ * @param {Object} aiConfig - Configuration object for the AI service, including provider details.
+ * 
  * @property {JobRepository} jobRepository - Repository for job data access.
  * @property {AIService} aiService - Service for AI-powered operations.
  */
 class JobService {
-    constructor() {
+    constructor(aiConfig) {
         this.jobRepository = new JobRepository();
-        this.aiService = new AIService();
+        this.aiService = new AIService(aiConfig);
     }
 
     /**
@@ -40,7 +42,7 @@ class JobService {
             const aiResult = await aiClient.extractJobQueryDetails(input);
 
             if (!aiResult || !aiResult.query) {
-                throw new Error('AI did not return a valid job query');
+                throw new AppError(ERROR_TYPES.BAD_REQUEST, 'AI did not return a valid job query');
             }
 
             // Normalize the job query
@@ -57,7 +59,7 @@ class JobService {
 
             return jobs || [];
         } catch (error) {
-            throw new Error('Failed to search jobs', error);
+            throw error;
         }
     }
 }

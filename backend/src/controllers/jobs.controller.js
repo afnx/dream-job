@@ -1,19 +1,21 @@
 const JobService = require('../services/job/job-service');
 const { AppError, ERROR_TYPES } = require('../utils/errors/index');
 const { success } = require('../utils/helpers/response-helper');
+const env = require('../config/env');
 
 /**
  * Extracts job search criteria from user input and returns matching jobs
  * @param {Object} req - Express request object
  * @param {string} req.body.input - Natural language job search query
  * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  * @returns {Object} Job search results or error response
  */
-exports.searchJobs = async (req, res) => {
+exports.searchJobs = async (req, res, next) => {
     try {
         const { input } = req.body;
 
-        const jobService = new JobService();
+        const jobService = new JobService(env.ai);
         const jobs = await jobService.searchJobs(input);
 
         if (!Array.isArray(jobs) || jobs.length === 0) {
