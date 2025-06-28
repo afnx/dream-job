@@ -1,5 +1,7 @@
 const { OpenAI } = require("openai");
 const AIClient = require("./ai-client");
+const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
+const { mapOpenAIError } = require("../../utils/errors/ai-error-mappers/openai");
 
 class OpenAIClient extends AIClient {
     /**
@@ -11,7 +13,11 @@ class OpenAIClient extends AIClient {
     constructor(config) {
         super(config);
         if (!config || !config.apiKey || !config.model) {
-            throw new Error("OpenAIClient is not configured properly. Please provide apiKey and model.");
+            throw new AIServiceError(
+                ERROR_TYPES.CONFIG_ERROR,
+                'OpenAIClient is not configured properly. Please provide apiKey and model.',
+                500
+            );
         }
 
         this.model = config.model;
@@ -79,30 +85,7 @@ class OpenAIClient extends AIClient {
             };
 
         } catch (error) {
-            // Handle different types of errors
-            if (error.code === 'insufficient_quota') {
-                throw new Error('OpenAI quota exceeded. Please check your billing.');
-            } else if (error.code === 'invalid_api_key') {
-                throw new Error('Invalid OpenAI API key. Please check your configuration.');
-            } else if (error.code === 'model_not_found') {
-                throw new Error(`Model '${this.model}' not found. Please check your model configuration.`);
-            } else if (error.code === 'rate_limit_exceeded') {
-                throw new Error('OpenAI rate limit exceeded. Please try again later.');
-            } else if (error.name === 'AbortError') {
-                throw new Error('Request timeout. Please try again.');
-            }
-
-            // Re-throw our custom errors
-            if (error.message.includes('Invalid user input') ||
-                error.message.includes('not configured') ||
-                error.message.includes('Invalid JSON response') ||
-                error.message.includes('AI response is not valid')) {
-                throw error;
-            }
-
-            // Log unexpected errors for debugging
-            console.error('Unexpected error in extractJobQueryDetails:', error);
-            throw new Error(`Failed to extract job query details: ${error.message}`);
+            throw mapOpenAIError(error, 'Failed to extract job query details');
         }
     }
 
@@ -166,33 +149,7 @@ class OpenAIClient extends AIClient {
             return sanitizedRankings;
 
         } catch (error) {
-            // Handle different types of errors
-            if (error.code === 'insufficient_quota') {
-                throw new Error('OpenAI quota exceeded. Please check your billing.');
-            } else if (error.code === 'invalid_api_key') {
-                throw new Error('Invalid OpenAI API key. Please check your configuration.');
-            } else if (error.code === 'model_not_found') {
-                throw new Error(`Model '${this.model}' not found. Please check your model configuration.`);
-            } else if (error.code === 'rate_limit_exceeded') {
-                throw new Error('OpenAI rate limit exceeded. Please try again later.');
-            } else if (error.code === 'context_length_exceeded') {
-                throw new Error('Job listings are too large. Please try with fewer listings.');
-            } else if (error.name === 'AbortError') {
-                throw new Error('Request timeout. Please try again.');
-            }
-
-            // Re-throw our custom errors
-            if (error.message.includes('Invalid user input') ||
-                error.message.includes('Invalid job listings') ||
-                error.message.includes('not configured') ||
-                error.message.includes('Invalid JSON response') ||
-                error.message.includes('AI response is not valid')) {
-                throw error;
-            }
-
-            // Log unexpected errors for debugging
-            console.error('Unexpected error in rankJobListings:', error);
-            throw new Error(`Failed to rank job listings: ${error.message}`);
+            throw mapOpenAIError(error, 'Failed to rank job listings');
         }
     }
 }
