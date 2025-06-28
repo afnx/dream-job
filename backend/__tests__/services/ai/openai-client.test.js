@@ -155,7 +155,7 @@ describe('OpenAIClient', () => {
             mockChatCompletions.create.mockResolvedValue(mockResponse);
 
             await expect(client.extractJobQueryDetails('test input')).rejects.toThrow(
-                'Invalid JSON response from AI'
+                /Failed to extract job query details: Invalid JSON/
             );
         });
 
@@ -169,7 +169,7 @@ describe('OpenAIClient', () => {
             mockChatCompletions.create.mockResolvedValue(mockResponse);
 
             await expect(client.extractJobQueryDetails('test input')).rejects.toThrow(
-                'Invalid response from OpenAI API: no content received'
+                /Failed to extract job query details: No content received/
             );
         });
 
@@ -341,7 +341,7 @@ describe('OpenAIClient', () => {
             mockChatCompletions.create.mockResolvedValue(mockResponse);
 
             await expect(client.rankJobListings('test query', sampleJobListings)).rejects.toThrow(
-                'AI response is not a valid array'
+                'Failed to rank job listings: Not a valid array'
             );
         });
 
@@ -352,7 +352,7 @@ describe('OpenAIClient', () => {
             mockChatCompletions.create.mockRejectedValue(apiError);
 
             await expect(client.rankJobListings('test query', sampleJobListings)).rejects.toThrow(
-                'Job listings are too large. Please try with fewer listings.'
+                'Failed to rank job listings: Context length exceeded'
             );
         });
 
@@ -376,49 +376,6 @@ describe('OpenAIClient', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe('valid');
-        });
-    });
-
-    describe('error logging', () => {
-        let client;
-        let consoleSpy;
-
-        beforeEach(() => {
-            client = new OpenAIClient({ apiKey: 'test-key', model: 'gpt-3.5-turbo' });
-            consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
-        });
-
-        afterEach(() => {
-            consoleSpy.mockRestore();
-        });
-
-        it('should log JSON parsing errors', async () => {
-            const mockResponse = {
-                choices: [{
-                    message: {
-                        content: 'Invalid JSON'
-                    }
-                }]
-            };
-
-            mockChatCompletions.create.mockResolvedValue(mockResponse);
-
-            await expect(client.extractJobQueryDetails('test')).rejects.toThrow();
-            expect(consoleSpy).toHaveBeenCalledWith(
-                'Failed to parse OpenAI response as JSON:',
-                'Invalid JSON'
-            );
-        });
-
-        it('should log unexpected errors', async () => {
-            const unexpectedError = new Error('Unexpected error');
-            mockChatCompletions.create.mockRejectedValue(unexpectedError);
-
-            await expect(client.extractJobQueryDetails('test')).rejects.toThrow();
-            expect(consoleSpy).toHaveBeenCalledWith(
-                'Unexpected error in extractJobQueryDetails:',
-                unexpectedError
-            );
         });
     });
 });

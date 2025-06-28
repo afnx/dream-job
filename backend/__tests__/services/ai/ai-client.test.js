@@ -73,13 +73,13 @@ describe('AIClient', () => {
     });
 
     test('extractJobQueryDetails should throw "Not implemented" error', async () => {
-      await expect(client.extractJobQueryDetails('test input')).rejects.toThrow('Not implemented');
+      await expect(client.extractJobQueryDetails('test input')).rejects.toThrow('extractJobQueryDetails() not implemented.');
     });
 
     test('rankJobListings should throw "Not implemented" error', async () => {
       const userQuery = { keywords: ['developer'] };
       const jobListings = [{ id: '1', title: 'Developer' }];
-      await expect(client.rankJobListings(userQuery, jobListings)).rejects.toThrow('Not implemented');
+      await expect(client.rankJobListings(userQuery, jobListings)).rejects.toThrow('rankJobListings() not implemented.');
     });
   });
 

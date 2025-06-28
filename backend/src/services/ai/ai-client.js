@@ -1,14 +1,16 @@
+const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
+
 /**
- * Abstract parent class for AI clients.
+ * AIClient is an abstract base class for AI-powered job query and ranking services.
+ * It provides the interface for extracting job query details from user input and ranking job listings.
+ * 
+ * @class
+ * @param {object} config - Configuration object for the AI client.
  */
 class AIClient {
-  /**
-   * Constructor for AIClient.
-   * @param {object} config - Configuration object for the AI client.
-   */
   constructor(config) {
     if (!config) {
-      throw new Error("AIClient requires a configuration object.");
+      throw new AIServiceError(ERROR_TYPES.CONFIG_ERROR, "AIClient requires a configuration object.", 500);
     }
     this.config = config;
   }
@@ -19,7 +21,7 @@ class AIClient {
    * @returns {Promise<object>} - Extracted details.
    */
   async extractJobQueryDetails(userInput) {
-    throw new Error("Not implemented");
+    throw new AIServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "extractJobQueryDetails() not implemented.", 501);
   }
 
   /**
@@ -29,7 +31,7 @@ class AIClient {
    * @returns {Promise<Array>} - Ranked job listings.
    */
   async rankJobListings(userQuery, jobListings) {
-    throw new Error("Not implemented");
+    throw new AIServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "rankJobListings() not implemented.", 501);
   }
 }
 

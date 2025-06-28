@@ -1,4 +1,6 @@
 const JobService = require('../services/job/job-service');
+const { AppError, ERROR_TYPES } = require('../utils/errors/index');
+const { success } = require('../utils/helpers/response-helper');
 const env = require('../config/env');
 
 /**
@@ -6,22 +8,26 @@ const env = require('../config/env');
  * @param {Object} req - Express request object
  * @param {string} req.body.input - Natural language job search query
  * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  * @returns {Object} Job search results or error response
  */
-exports.searchJobs = async (req, res) => {
+exports.searchJobs = async (req, res, next) => {
     try {
         const { input } = req.body;
 
-        const jobService = new JobService();
+        const jobService = new JobService(env.ai);
         const jobs = await jobService.searchJobs(input);
 
         if (!Array.isArray(jobs) || jobs.length === 0) {
-            return res.status(404).json({ error: 'No jobs found matching the criteria.' });
+            return AppError(
+                res,
+                ERROR_TYPES.NOT_FOUND,
+                'No jobs found matching the search criteria.'
+            );
         }
 
-        res.status(200).json({ data: jobs });
+        return success(res, jobs);
     } catch (err) {
-        console.error('Error in searching jobs:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        next(err);
     }
 };
