@@ -1,14 +1,14 @@
 const OpenAIClient = require("./openai-client");
 const { ERROR_TYPES, AIServiceError } = require("../../utils/errors");
 
+/**
+ * Service class for managing AI provider clients.
+ *
+ * @class
+ * @param {Object} config - Configuration object for the AI service.
+ * @param {string} config.provider - The name of the AI provider (e.g., "openai").
+ */
 class AIService {
-    /**
-    * Service class for managing AI provider clients.
-    *
-    * @class
-    * @param {Object} config - Configuration object for the AI service.
-    * @param {string} config.provider - The name of the AI provider (e.g., "openai").
-    */
     constructor(config) {
         if (!config || !config.provider) {
             throw new AIServiceError(

@@ -6,13 +6,15 @@ const adaptJobQueryResponse = require('../../utils/ai-response-parsers/job-query
 const adaptJobRankingResponse = require('../../utils/ai-response-parsers/job-ranking-adapter');
 
 
+/**
+ * OpenClient Service for interacting with OpenAI's API.
+ * 
+ * @class
+ * @param {object} config - Configuration specific to OpenAI (e.g., apiKey, model).
+ * @param {string} config.apiKey - The API key for OpenAI.
+ * @param {string} config.model - The model to use for OpenAI requests (e.g., "gpt-3.5-turbo").
+ */
 class OpenAIClient extends AIClient {
-    /**
-    * OpenClient Service for interacting with OpenAI's API.
-    * @param {object} config - Configuration specific to OpenAI (e.g., apiKey, model).
-    * @param {string} config.apiKey - The API key for OpenAI.
-    * @param {string} config.model - The model to use for OpenAI requests (e.g., "gpt-3.5-turbo").
-    */
     constructor(config) {
         super(config);
         if (!config || !config.apiKey || !config.model) {

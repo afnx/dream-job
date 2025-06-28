@@ -1,13 +1,13 @@
 const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
 
 /**
- * Abstract parent class for AI clients.
+ * AIClient is an abstract base class for AI-powered job query and ranking services.
+ * It provides the interface for extracting job query details from user input and ranking job listings.
+ * 
+ * @class
+ * @param {object} config - Configuration object for the AI client.
  */
 class AIClient {
-  /**
-   * Constructor for AIClient.
-   * @param {object} config - Configuration object for the AI client.
-   */
   constructor(config) {
     if (!config) {
       throw new AIServiceError(ERROR_TYPES.CONFIG_ERROR, "AIClient requires a configuration object.", 500);
