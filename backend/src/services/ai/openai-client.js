@@ -1,7 +1,10 @@
 const { OpenAI } = require("openai");
 const AIClient = require("./ai-client");
 const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
-const { mapOpenAIError } = require("../../utils/errors/ai-error-mappers/openai");
+const mapOpenAIError = require("../../utils/errors/ai-error-mappers/openai");
+const adaptJobQueryResponse = require('../../utils/ai-response-parsers/job-query-adapter');
+const adaptJobRankingResponse = require('../../utils/ai-response-parsers/job-ranking-adapter');
+
 
 class OpenAIClient extends AIClient {
     /**
@@ -51,41 +54,10 @@ class OpenAIClient extends AIClient {
                 temperature: 0.3,
             });
 
-            // Validate response structure
-            if (!response?.choices?.[0]?.message?.content) {
-                throw new Error('Invalid response from OpenAI API: no content received');
-            }
-
-            const content = response.choices[0].message.content.trim();
-
-            // Parse JSON response with error handling
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(content);
-            } catch (jsonError) {
-                console.error('Failed to parse OpenAI response as JSON:', content);
-                throw new Error(`Invalid JSON response from AI: ${jsonError.message}`);
-            }
-
-            // Validate parsed response structure
-            if (!parsedResponse || typeof parsedResponse !== 'object') {
-                throw new Error('AI response is not a valid object');
-            }
-
-            return {
-                keywords: parsedResponse.keywords,
-                location: parsedResponse.location,
-                experience: parsedResponse.experience,
-                salaryMin: parsedResponse.salaryMin,
-                salaryMax: parsedResponse.salaryMax,
-                salaryCurrency: parsedResponse.salaryCurrency,
-                jobType: parsedResponse.jobType,
-                remoteOption: parsedResponse.remoteOption,
-                otherPreferences: parsedResponse.otherPreferences
-            };
+            return adaptJobQueryResponse(response, 'openai');
 
         } catch (error) {
-            throw mapOpenAIError(error, 'Failed to extract job query details');
+            throw mapOpenAIError(error, this.config, 'Failed to extract job query details');
         }
     }
 
@@ -113,43 +85,10 @@ class OpenAIClient extends AIClient {
                 temperature: 0.3,
             });
 
-            // Validate response structure
-            if (!response?.choices?.[0]?.message?.content) {
-                throw new Error('Invalid response from OpenAI API: no content received');
-            }
-
-            const content = response.choices[0].message.content.trim();
-
-            // Parse JSON response with error handling
-            let parsedResponse;
-            try {
-                parsedResponse = JSON.parse(content);
-            } catch (jsonError) {
-                console.error('Failed to parse OpenAI response as JSON:', content);
-                throw new Error(`Invalid JSON response from AI: ${jsonError.message}`);
-            }
-
-            // Validate parsed response is an array
-            if (!Array.isArray(parsedResponse)) {
-                console.error('AI response is not an array:', parsedResponse);
-                throw new Error('AI response is not a valid array');
-            }
-
-            // Validate each ranking item and sanitize
-            const sanitizedRankings = parsedResponse
-                .filter(item => item && typeof item === 'object')
-                .map((item, index) => ({
-                    id: item.id || `unknown_${index}`,
-                    ranking: typeof item.ranking === 'number' ? item.ranking : index + 1,
-                    title: typeof item.title === 'string' ? item.title : 'Unknown Title',
-                    company: typeof item.company === 'string' ? item.company : 'Unknown Company',
-                    reason: typeof item.reason === 'string' ? item.reason : 'No reason provided'
-                }));
-
-            return sanitizedRankings;
+            return adaptJobRankingResponse(response, 'openai');
 
         } catch (error) {
-            throw mapOpenAIError(error, 'Failed to rank job listings');
+            throw mapOpenAIError(error, this.config, 'Failed to rank job listings');
         }
     }
 }
