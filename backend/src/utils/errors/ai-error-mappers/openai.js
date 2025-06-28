@@ -1,6 +1,6 @@
 const { AIServiceError, ERROR_TYPES } = require('../index');
 
-function mapOpenAIError(error, context = 'OpenAI operation failed') {
+function mapOpenAIError(error, config, context = 'OpenAI operation failed') {
     if (error.code === 'insufficient_quota') {
         return new AIServiceError(
             ERROR_TYPES.QUOTA_EXCEEDED,
@@ -17,7 +17,7 @@ function mapOpenAIError(error, context = 'OpenAI operation failed') {
     } else if (error.code === 'model_not_found') {
         return new AIServiceError(
             ERROR_TYPES.AI_MODEL_NOT_FOUND,
-            `Model '${this.model}' not found. Please check your model configuration.`,
+            `Model '${config.model}' not found. Please check your model configuration.`,
             400
         );
 
