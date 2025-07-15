@@ -8,7 +8,7 @@ module.exports = (err, req, res, next) => {
     if (err instanceof AppError) {
         return errorResponse(
             res,
-            [{ type: err.type, field: err.field, message: err.message }],
+            [{ type: err.type, message: err.message }],
             err.message,
             err.status
         );
