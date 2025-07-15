@@ -19,10 +19,11 @@ exports.searchJobs = async (req, res, next) => {
         const jobs = await jobService.searchJobs(input);
 
         if (!Array.isArray(jobs) || jobs.length === 0) {
-            return AppError(
-                res,
-                ERROR_TYPES.NOT_FOUND,
-                'No jobs found matching the search criteria.'
+            return next(
+                new AppError(
+                    ERROR_TYPES.NOT_FOUND,
+                    'No jobs found matching the search criteria.'
+                )
             );
         }
 
