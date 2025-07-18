@@ -27,11 +27,11 @@ exports.validateUserInput = (req, res, next) => {
                 message: 'Input cannot be empty.'
             });
         }
-        if (trimmedInput.length > 0 && trimmedInput.length < 3) {
+        if (trimmedInput.length > 0 && trimmedInput.length < 10) {
             errors.push({
                 type: ERROR_TYPES.VALUE_TOO_SHORT,
                 field: "input",
-                message: 'Input must be at least 3 characters long.'
+                message: 'Please provide a bit more detail so we can assist you effectively.'
             });
         }
         if (trimmedInput.length > 1000) {

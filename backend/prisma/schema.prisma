@@ -25,6 +25,7 @@ model Job {
   remoteOption   RemoteOption?
   postedAt       DateTime?
   link           String
+  applyLink      String?
   skills         String[]
   benefits       String[]
   expiresAt      DateTime?
