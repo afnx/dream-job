@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 });
 
 // Use centralized routes
-app.use(env.apiPrefix, routes);
+app.use(`${env.apiPrefix}/${env.apiVersion}`, routes);
 
 // Error handling middleware
 // This should be the last middleware in the stack
