@@ -1,4 +1,3 @@
-const e = require('express');
 const OpenAIClient = require('../../../src/services/ai/openai-client');
 const { OpenAI } = require('openai');
 
