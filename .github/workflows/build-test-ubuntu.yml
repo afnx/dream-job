@@ -1,14 +1,20 @@
 name: Build and Test on Ubuntu
 
 on:
-  pull_request:
-    branches:
-      - dev
+  workflow_run:
+    workflows: ["Code Quality Checks"]
+    types: [completed]
+    branches: [dev]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
     
     steps:
       - name: Checkout code
@@ -21,21 +27,37 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
-            path: /tmp/.buildx-cache
-
-            key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package.json', '**/package-lock.json', '**/.env.example') }}
-            restore-keys: |
-                ${{ runner.os }}-buildx-
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json', '**/.env.example') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json', '**/.env.example') }}-
+            ${{ runner.os }}-buildx-
 
       - name: Build backend Docker image with buildx
         uses: docker/build-push-action@v6
         with:
-            context: ./backend
-            file: ./backend/Dockerfile
-            builder: ${{ steps.buildx.outputs.name }}
-            load: true
-            cache-from: type=local,src=/tmp/.buildx-cache
-            cache-to: type=local,dest=/tmp/.buildx-cache
+          context: ./backend
+          file: ./backend/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          load: true
+          tags: |
+            dream-job-backend:${{ github.sha }}
+            dream-job-backend:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Build frontend Docker image with buildx
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          load: true
+          tags: |
+            dream-job-frontend:${{ github.sha }}
+            dream-job-frontend:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       - name: Create .env file
         run: cp .env.example .env
@@ -46,17 +68,56 @@ jobs:
           
       - name: Wait for database to be ready
         run: |
-          until docker exec $(docker compose ps -q db) pg_isready; do
-            echo "Waiting for database..."
-            sleep 5
-          done
+          echo "Waiting for database to be ready..."
+          timeout 120s bash -c '
+            until docker exec $(docker compose ps -q db) pg_isready > /dev/null 2>&1; do
+              echo "Database not ready, waiting..."
+              sleep 2
+            done
+          '
+          echo "Database is ready!"
 
-      - name: Run tests
+      - name: Run backend tests
         run: |
 
           CONTAINER_NAME=$(docker compose ps -q backend)
           docker exec $CONTAINER_NAME npm test
 
-      - name: Clean up Docker containers
+      - name: Run frontend tests
         run: |
-          docker compose -f docker-compose.yml down
+          CONTAINER_NAME=$(docker compose ps -q frontend)
+          docker exec $CONTAINER_NAME npm test
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Collecting service logs ==="
+          echo "=== Backend Logs ==="
+          docker compose logs backend || echo "No backend logs available"
+          echo ""
+          echo "=== Frontend Logs ==="
+          docker compose logs frontend || echo "No frontend logs available"
+          echo ""
+          echo "=== Database Logs ==="
+          docker compose logs db || echo "No database logs available"
+          echo ""
+          echo "=== Docker ps ==="
+          docker compose ps
+          echo ""
+          echo "=== Docker system info ==="
+          docker system df
+
+      - name: Clean up Docker containers
+        if: always()
+        run: |
+          echo "Cleaning up Docker resources..."
+          
+          # Stop and remove containers with volumes
+          docker compose -f docker-compose.yml down -v --remove-orphans || true
+          
+          # Clean up unused resources
+          docker system prune -f || true
+          
+          # Move cache to avoid growing indefinitely
+          rm -rf /tmp/.buildx-cache || true
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
