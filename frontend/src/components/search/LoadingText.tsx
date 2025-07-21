@@ -26,7 +26,7 @@ export function LoadingText({ isVisible, className = "" }: LoadingTextProps) {
             return;
         }
 
-        let timeoutId: NodeJS.Timeout;
+        let timeoutId: ReturnType<typeof setTimeout>;
 
         const scheduleNext = (index: number) => {
             // If we're at the last message or duration is 0, don't schedule next

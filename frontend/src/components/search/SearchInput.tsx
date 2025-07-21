@@ -1,13 +1,13 @@
 'use client';
 
+import React, { useState, useRef } from 'react';
 import { ArrowRight, LoaderPinwheel } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState, useRef } from 'react';
 import { LoadingText } from './LoadingText';
 
 interface SearchInputProps {
     value?: string;
-    onSubmit: (value: string) => void;
+    onSubmit: (_value: string) => void;
     placeholder?: string;
     isLoading?: boolean;
 }

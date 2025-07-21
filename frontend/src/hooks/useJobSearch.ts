@@ -9,7 +9,7 @@ interface UseJobSearchResult {
     error: string | null;
     fieldErrors: Record<string, string[]>;
     searchQuery: string;
-    setSearchQuery: (query: string) => void;
+    setSearchQuery: (_query: string) => void;
     clearError: () => void;
 }
 
