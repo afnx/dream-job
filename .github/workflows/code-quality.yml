@@ -19,7 +19,11 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-    - uses: dorny/paths-filter@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for changes
+      uses: dorny/paths-filter@v3
       id: filter
       with:
         filters: |
@@ -75,3 +79,11 @@ jobs:
         run: |
           npm ci
           npm run lint
+
+  complete-checks:
+    runs-on: ubuntu-latest
+    needs: [lint-backend, lint-frontend]
+    if: ${{ always() }}
+    steps:
+      - name: Mark workflow as complete
+        run: echo "All code quality checks completed successfully."
