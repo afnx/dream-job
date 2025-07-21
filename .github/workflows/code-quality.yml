@@ -13,29 +13,27 @@ jobs:
   # Detect what changed
   changes:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
-      backend: ${{ steps.changes.outputs.backend }}
-      frontend: ${{ steps.changes.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Check for changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            backend:
-              - 'backend/**'
-            frontend:
-              - 'frontend/**'
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+          frontend:
+            - 'frontend/**'
 
   # Backend lint job
   lint-backend:
     name: Lint Backend
-    runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - name: Checkout code
@@ -57,9 +55,9 @@ jobs:
   # Frontend lint job
   lint-frontend:
     name: Lint Frontend
-    runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.frontend == 'true'
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - name: Checkout code
