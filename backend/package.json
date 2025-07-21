@@ -1,20 +1,23 @@
 {
-  "name": "dream-job",
-  "version": "1.0.0",
+  "name": "dream-job-backend",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/afnx/dream-job.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Ali Fuat Numanoglu",
+  "license": "Business Source License 1.1",
   "bugs": {
     "url": "https://github.com/afnx/dream-job/issues"
   },
@@ -31,6 +34,9 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.3.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
     "prisma": "^6.9.0"
