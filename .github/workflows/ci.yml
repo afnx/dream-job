@@ -1,9 +1,9 @@
-name: CI
+name: CI Pipeline
 
 on:
-  workflow_run:
-    workflows: ["Code Quality Checks"]
-    types: [completed]
+  pull_request:
+    branches:
+      - dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -191,14 +191,11 @@ jobs:
       - name: Clean up Docker containers
         if: always()
         run: |
-          echo "Cleaning up Docker resources..."
+          echo "Stopping services..."
+          docker compose -f docker-compose.yml down -v --remove-orphans --timeout 30 || true
           
-          # Stop and remove containers with volumes
-          docker compose -f docker-compose.yml down -v --remove-orphans || true
+          # Clean up specific images to avoid removing cached layers
+          docker rmi dream-job-backend:latest dream-job-frontend:latest || true
           
-          # Clean up unused resources
-          docker system prune -f || true
-          
-          # Move cache to avoid growing indefinitely
-          rm -rf /tmp/.buildx-cache || true
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+          # Prune only dangling resources
+          docker system prune -f --volumes || true
