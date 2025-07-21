@@ -1,14 +1,27 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "dream-job-frontend",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "jest --passWithNoTests"
+    "lint": "next lint --no-cache",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afnx/dream-job.git"
+  },
+  "keywords": [],
+  "author": "Ali Fuat Numanoglu",
+  "license": "Business Source License 1.1",
+  "bugs": {
+    "url": "https://github.com/afnx/dream-job/issues"
+  },
+  "homepage": "https://github.com/afnx/dream-job#readme",
   "dependencies": {
     "framer-motion": "^12.23.6",
     "lucide-react": "^0.525.0",
@@ -25,6 +38,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
     "jest": "^30.0.4",
