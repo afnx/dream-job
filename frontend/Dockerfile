@@ -16,9 +16,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:3000 || exit 1
-
 CMD ["npm", "run", "dev"]
 
 # Build stage (for production)
@@ -45,7 +42,7 @@ COPY --from=builder /app/package*.json ./
 USER nextjs
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=1m --timeout=5s --start-period=1m --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
 CMD ["npm", "start"]
