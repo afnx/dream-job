@@ -1,8 +1,8 @@
 const JobRepository = require('../../repositories/job-repository');
 const AIService = require('../ai/ai-service');
 const ScraperService = require('../scraper/scraper-service');
-const { normalizeJobQuery } = require('../../utils/normalizers');
-const { AppError, ERROR_TYPES } = require('../../utils/errors');
+// const { normalizeJobQuery } = require('../../utils/normalizers');
+// const { AppError, ERROR_TYPES } = require('../../utils/errors');
 
 /**
  * Service class for handling job operations.
@@ -38,40 +38,40 @@ class JobService {
      * @throws {Error} If the AI fails to extract a valid job query or if the search process encounters an error.
      */
     async searchJobs(input) {
-        try {
+        // try {
 
-            // TODO: For now, we will scrape jobs directly without AI extraction
-            const jobs = await this.scraperService.scrapeJobs({
-                keywords: input,
-                location: 'San Francisco, CA',
-                page: 0
-            });
+        // TODO: For now, we will scrape jobs directly without AI extraction
+        const jobs = await this.scraperService.scrapeJobs({
+            keywords: input,
+            location: 'San Francisco, CA',
+            page: 0
+        });
 
-            // const aiClient = this.aiService.getAIClient();
+        // const aiClient = this.aiService.getAIClient();
 
-            // // Extract job query details using AI
-            // const aiResult = await aiClient.extractJobQueryDetails(input);
+        // // Extract job query details using AI
+        // const aiResult = await aiClient.extractJobQueryDetails(input);
 
-            // if (!aiResult || !aiResult.query) {
-            //     throw new AppError(ERROR_TYPES.BAD_REQUEST, 'AI did not return a valid job query');
-            // }
+        // if (!aiResult || !aiResult.query) {
+        //     throw new AppError(ERROR_TYPES.BAD_REQUEST, 'AI did not return a valid job query');
+        // }
 
-            // // Normalize the job query
-            // const normalizedQuery = normalizeJobQuery(aiResult);
+        // // Normalize the job query
+        // const normalizedQuery = normalizeJobQuery(aiResult);
 
-            // // Search for jobs using the normalized query
-            // const jobs = await this.jobRepository.searchJobs(normalizedQuery);
+        // // Search for jobs using the normalized query
+        // const jobs = await this.jobRepository.searchJobs(normalizedQuery);
 
-            // if (!jobs || jobs.length === 0) {
-            //     // TODO: Implement logic to scrape jobs if no results found
-            // }
+        // if (!jobs || jobs.length === 0) {
+        //     // TODO: Implement logic to scrape jobs if no results found
+        // }
 
-            // TODO: Rank the job listings using AI
+        // TODO: Rank the job listings using AI
 
-            return jobs || [];
-        } catch (error) {
-            throw error;
-        }
+        return jobs || [];
+        // } catch (error) {
+        //     throw error;
+        // }
     }
 }
 

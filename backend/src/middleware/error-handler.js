@@ -1,7 +1,7 @@
 const { AppError, ValidationError, AIServiceError, ERROR_TYPES } = require('../utils/errors/index');
 const { error: errorResponse } = require('../utils/helpers/response-helper');
 
-module.exports = (err, req, res, next) => {
+module.exports = (err, req, res, _next) => {
     if (err instanceof ValidationError) {
         return errorResponse(res, err.errors, err.message, err.status);
     }

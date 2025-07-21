@@ -7,7 +7,7 @@ class IndeedScraper extends BaseScraper {
         this.baseUrl = 'https://www.indeed.com/jobs';
     }
 
-    async scrape(query) {
+    async scrape(_query) {
         // TODO: IndeedScraper gets blocked by Cloudflare, implement a workaround
         throw new ScraperServiceError(
             ERROR_TYPES.SCRAPER_NOT_FOUND,

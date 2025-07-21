@@ -20,7 +20,7 @@ class AIClient {
    * @param {string} userInput - The user's input string.
    * @returns {Promise<object>} - Extracted details.
    */
-  async extractJobQueryDetails(userInput) {
+  async extractJobQueryDetails(_userInput) {
     throw new AIServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "extractJobQueryDetails() not implemented.", 501);
   }
 
@@ -30,7 +30,7 @@ class AIClient {
    * @param {Array} jobListings - Array of job listings to rank.
    * @returns {Promise<Array>} - Ranked job listings.
    */
-  async rankJobListings(userQuery, jobListings) {
+  async rankJobListings(_userQuery, _jobListings) {
     throw new AIServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "rankJobListings() not implemented.", 501);
   }
 }

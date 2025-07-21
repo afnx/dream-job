@@ -145,9 +145,9 @@ class JobRepository extends BaseRepository {
                     mode: 'insensitive'
                 }
             } : null,
-            experienceLevel ? {
-                experienceLevel: {
-                    equals: experienceLevel,
+            experience ? {
+                experience: {
+                    equals: experience,
                     mode: 'insensitive'
                 }
             } : null,

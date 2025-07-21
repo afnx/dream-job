@@ -4,7 +4,7 @@
  * @returns {string} Escaped selector
  */
 function escapeCssSelector(selector) {
-    return selector.replace(/([ #;?%&,.+*~\':"!^$[\]()=>|/@])/g, '\\$1');
+    return selector.replace(/([ #;?%&,.+*~':"!^$[\]()=>|/@])/g, '\\$1');
 }
 
 /**

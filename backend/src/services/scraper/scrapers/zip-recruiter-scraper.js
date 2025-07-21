@@ -223,7 +223,7 @@ class ZipRecruiterScraper extends BaseScraper {
      * @returns {string} The constructed search URL.
      */
     buildUrl(query) {
-        const { keywords, location, page } = query;
+        const { keywords, location } = query;
         const params = new URLSearchParams({
             search: keywords,
             location: location,

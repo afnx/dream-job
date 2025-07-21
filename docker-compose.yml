@@ -1,4 +1,17 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "${NEXT_JS_PORT}:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - /app/.next
+    env_file:
+      - .env
   backend:
     build: ./backend
     ports:
@@ -26,4 +39,5 @@ services:
 
 volumes:
   backend_node_modules:
+  frontend_node_modules:
   db_data:

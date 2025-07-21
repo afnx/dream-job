@@ -39,8 +39,8 @@ module.exports = {
 
     // Frontend Configuration
     frontend: {
-        port: parseInt(envVars.REACT_PORT),
-        host: envVars.REACT_HOST,
-        url: envVars.REACT_APP_URL
+        port: parseInt(envVars.NEXT_JS_PORT),
+        host: envVars.NEXT_JS_HOST,
+        url: envVars.NEXT_JS_APP_URL
     }
 };

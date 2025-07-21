@@ -9,7 +9,7 @@ class BaseScraper {
      * @throws {Error} Throws an error if not implemented by subclass.
      * @returns {Promise<Array<Object>>} A promise that resolves to an array of data objects.
      */
-    async scrape(query) {
+    async scrape(_query) {
         throw new ScraperServiceError(
             'scrape() must be implemented by subclass',
             ERROR_TYPES.NOT_IMPLEMENTED,
