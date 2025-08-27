@@ -209,7 +209,7 @@ dream-job/
 | Platform | Status | Notes |
 |----------|--------|-------|
 | **ZipRecruiter** | ✅ Active | Full scraping support |
-| **Indeed** | 🚧 In Development | Blocked by Cloudflare |
+| **Indeed** | 🚧 In Development |  |
 
 ### AI Services
 | Service | Status | Models |
