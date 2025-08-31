@@ -3,11 +3,13 @@ const ValidationError = require('./validation-error');
 const AppError = require('./app-error');
 const AIServiceError = require('./ai-service-error');
 const ScraperServiceError = require('./scraper-service-error');
+const AuthServiceError = require("./auth-service-error")
 
 module.exports = {
     AppError,
     ValidationError,
     AIServiceError,
     ScraperServiceError,
+    AuthServiceError,
     ERROR_TYPES
 };
