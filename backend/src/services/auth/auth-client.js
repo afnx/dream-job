@@ -51,6 +51,19 @@ class AuthClient {
     async confirmSignUp(_email, _code) {
         throw new AuthServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "confirmSignUp() must be implemented by subclass", 501);
     }
+
+
+    /**
+     * Signs out the user associated with the provided access token.
+     * This method must be implemented by subclasses.
+     *
+     * @param {string} _accessToken - The access token of the user to sign out.
+     * @throws {AuthServiceError} Throws if the method is not implemented.
+     * @returns {Promise<void>}
+     */
+    async signOut(_accessToken) {
+        throw new AuthServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "signOut() must be implemented by subclass", 501);
+    }
 }
 
 module.exports = AuthClient;
