@@ -27,7 +27,7 @@ class ZipRecruiterScraper extends BaseScraper {
         this.selectors = {
             jobCards: 'article[id^="job-card-"], div[id^="job-card-"]',
             rightPane: 'div[data-testid="right-pane"]',
-            title: 'h1.text-header-md',
+            title: 'h2.text-header-md',
             company: 'a.text-link, a[aria-label]',
             location: 'p.text-body-md',
             postedDate: 'p.text-body-md',
