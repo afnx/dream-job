@@ -37,7 +37,7 @@ class AuthService {
     getAuthClient() {
         switch (this.authProvider) {
             case "cognito":
-                return new CognitoAuthClient(this.config);
+                return new CognitoAuthClient(this.config.cognito);
             default:
                 throw new AuthServiceError(
                     ERROR_TYPES.UNSUPPORTED_PROVIDER,
