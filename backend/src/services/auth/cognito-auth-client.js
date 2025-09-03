@@ -2,7 +2,8 @@ const {
     CognitoIdentityProviderClient,
     InitiateAuthCommand,
     ConfirmSignUpCommand,
-    GetUserCommand
+    GetUserCommand,
+    GlobalSignOutCommand
 } = require('@aws-sdk/client-cognito-identity-provider');
 
 const AuthClient = require('./auth-client');
@@ -18,22 +19,22 @@ const { ERROR_TYPES, AuthServiceError } = require("../../utils/errors");
  * @extends AuthClient
  *
  * @param {Object} config - Configuration object.
- * @param {string} config.cognito_region - AWS Cognito region.
- * @param {string} config.cognito_client_id - AWS Cognito App Client ID.
+ * @param {string} config.region - AWS Cognito region.
+ * @param {string} config.clientId - AWS Cognito App Client ID.
  */
 class CognitoAuthClient extends AuthClient {
     constructor(config) {
         super(config);
-        if (!config || !config.cognito_region || !config.cognito_client_id) {
+        if (!config || !config.region || !config.clientId) {
             throw new AuthServiceError(
                 ERROR_TYPES.CONFIG_ERROR,
-                'CognitoAuthService is not configured properly. Please provide cognito_region and cognito_client_id.',
+                'CognitoAuthService is not configured properly. Please provide region and clientId.',
                 500
             );
         }
 
-        this.client = new CognitoIdentityProviderClient({ region: config.cognito_region });
-        this.clientId = config.cognito_client_id;
+        this.client = new CognitoIdentityProviderClient({ region: config.region });
+        this.clientId = config.clientId;
     }
 
     async signInPasswordless(email) {
@@ -86,6 +87,20 @@ class CognitoAuthClient extends AuthClient {
             throw new AuthServiceError(
                 ERROR_TYPES.CONFIRM_SIGN_UP_ERROR,
                 'Sign-up confirmation failed: ' + error.message,
+                500
+            );
+        }
+    }
+
+    async signOut(accessToken) {
+        try {
+            const command = new GlobalSignOutCommand({ AccessToken: accessToken });
+            const response = await this.client.send(command);
+            return response;
+        } catch (error) {
+            throw new AuthServiceError(
+                ERROR_TYPES.SIGN_OUT_ERROR,
+                'Sign-out failed: ' + error.message,
                 500
             );
         }
