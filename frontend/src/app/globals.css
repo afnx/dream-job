@@ -7,6 +7,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --gradient-bg: linear-gradient(to bottom right, #f9fafb, #ffffff, #f3e8ff);
 }
 
 @theme inline {
@@ -18,8 +19,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    /* --background: #0a0a0a;
     --foreground: #ededed;
+    --gradient-bg: linear-gradient(to bottom right, #232946, #393e5c, #6c63ff); */
   }
 }
 
@@ -27,6 +29,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.gradient-bg {
+  background-image: var(--gradient-bg);
 }
 
 .line-clamp-3 {
