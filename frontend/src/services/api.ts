@@ -1,4 +1,4 @@
-import { ErrorResponse } from "@/types/api";
+import { ApiResponse, ErrorResponse } from "@/types/api";
 import { JobSearchResponse } from "@/types/job";
 import { ApiException } from "@/utils/errors";
 
@@ -68,10 +68,40 @@ class ApiService {
      * @param input - The search query or criteria for job search.
      * @returns A promise that resolves to a `JobSearchResponse` containing the search results.
      */
-    async searchJobs(input: string): Promise<JobSearchResponse> {
+    async searchJobs(input: string, accessToken: string | undefined): Promise<JobSearchResponse> {
+        const headers: Record<string, string> = {};
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
         return this.makeRequest<JobSearchResponse>('/jobs/parse', {
             method: 'POST',
+            headers,
             body: JSON.stringify({ input }),
+        });
+    }
+
+    async signIn(email: string): Promise<ApiResponse> {
+        return this.makeRequest<ApiResponse>('/auth/sign-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+    }
+
+    async confirmSignIn(email: string, code: string): Promise<ApiResponse> {
+        return this.makeRequest<ApiResponse>('/auth/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code }),
+        });
+    }
+
+    async signOut(accessToken: string): Promise<ApiResponse> {
+        return this.makeRequest<ApiResponse>('/auth/sign-out', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
         });
     }
 }
