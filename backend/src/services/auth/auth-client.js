@@ -41,15 +41,15 @@ class AuthClient {
     }
 
     /**
-     * Confirms a user's sign up with the provided email and confirmation code.
+     * Confirms a user's sign in with the provided email and confirmation code.
      *
      * @param {string} _email - The email address of the user to confirm.
      * @param {string} _code - The confirmation code sent to the user's email.
      * @throws {AuthServiceError} Throws if the method is not implemented by a subclass.
-     * @returns {Promise<void>} Resolves when the sign up is confirmed.
+     * @returns {Promise<void>} Resolves when the sign in is confirmed.
      */
-    async confirmSignUp(_email, _code) {
-        throw new AuthServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "confirmSignUp() must be implemented by subclass", 501);
+    async confirmSignIn(_email, _code) {
+        throw new AuthServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "confirmSignIn() must be implemented by subclass", 501);
     }
 
 
