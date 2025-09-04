@@ -15,14 +15,14 @@ exports.signInPasswordless = async (req, res, next) => {
     }
 };
 
-exports.confirmSignUp = async (req, res, next) => {
+exports.confirmSignIn = async (req, res, next) => {
     try {
         const { email, code } = req.body;
         const authService = new AuthService(env.auth);
         const authClient = authService.getAuthClient();
 
-        const result = await authClient.confirmSignUp(email, code);
-        success(res, result, 'Sign-up confirmed!');
+        const result = await authClient.confirmSignIn(email, code);
+        success(res, result, 'Sign-in confirmed!');
     } catch (err) {
         next(err);
     }

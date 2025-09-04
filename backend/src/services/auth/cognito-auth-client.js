@@ -74,7 +74,7 @@ class CognitoAuthClient extends AuthClient {
 
     }
 
-    async confirmSignUp(email, code) {
+    async confirmSignIn(email, code) {
         try {
             const command = new ConfirmSignUpCommand({
                 ClientId: this.clientId,
