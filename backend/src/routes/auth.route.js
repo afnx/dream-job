@@ -1,12 +1,13 @@
 const express = require('express');
 const authController = require('../controllers/auth.controller');
-const config = require('../config/env');
 
+const router = express.Router();
 
-if (config.auth.provider && config.auth.provider !== 'none') {
-    const router = express.Router();
+// POST /api/auth/sign-in
+router.post('/sign-in', authController.signInPasswordless);
+// POST /api/auth/confirm
+router.post('/confirm', authController.confirmSignIn);
+// POST /api/auth/sign-out
+router.post('/sign-out', authController.signOut);
 
-    router.post('/sign-in', authController.signInPasswordless);
-    router.post('/confirm', authController.confirmSignIn);
-    router.post('/sign-out', authController.signOut);
-}
+module.exports = router;
