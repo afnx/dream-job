@@ -11,6 +11,7 @@ exports.authenticate = async (req, res, next) => {
             new AuthServiceError(
                 ERROR_TYPES.UNAUTHORIZED,
                 'Please sign in to continue.',
+                401
             ),
         );
     }
@@ -21,6 +22,7 @@ exports.authenticate = async (req, res, next) => {
         return next(
             new AuthServiceError(
                 ERROR_TYPES.UNAUTHORIZED, 'Your session has expired or the token is invalid. Please sign in again.',
+                401
             ),
         );
     }
