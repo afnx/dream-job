@@ -4,6 +4,7 @@ import { JobList } from '@/components/jobs/JobList';
 import { SearchInput } from '@/components/search/SearchInput';
 import { useJobSearch } from '@/hooks/useJobSearch';
 import Logo from '@/components/Logo';
+import LogOutButton from '@/components/search/LogOutButton';
 
 export default function Home() {
   const { jobs, isLoading, error, fieldErrors, searchQuery, setSearchQuery } = useJobSearch();
@@ -20,6 +21,12 @@ export default function Home() {
   return (
     <div className={`min-h-screen gradient-bg transition-all duration-700 ease-out ${hasActivity ? '' : 'flex items-center justify-center'
       }`}>
+      {/* Logout Button */}
+      {/* Show only if auth provider is configured */}
+      {process.env.NEXT_PUBLIC_AUTH_PROVIDER && process.env.NEXT_PUBLIC_AUTH_PROVIDER !== 'none' && (
+        <LogOutButton />
+      )}
+
       <div className={`w-full transition-all duration-700 ease-out ${hasActivity ? 'container mx-auto px-4 py-8' : 'container mx-auto px-4 py-8'
         }`}>
         {/* Header */}
