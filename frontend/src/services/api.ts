@@ -1,5 +1,6 @@
-import { ApiResponse, ErrorResponse } from "@/types/api";
+import { ErrorResponse } from "@/types/api";
 import { JobSearchResponse } from "@/types/job";
+import { AuthResponse } from "@/types/auth";
 import { ApiException } from "@/utils/errors";
 
 const API_BASE_URL = process.env.NODE_API_BASE_URL || 'http://localhost:5000/api/v1';
@@ -68,40 +69,34 @@ class ApiService {
      * @param input - The search query or criteria for job search.
      * @returns A promise that resolves to a `JobSearchResponse` containing the search results.
      */
-    async searchJobs(input: string, accessToken: string | undefined): Promise<JobSearchResponse> {
-        const headers: Record<string, string> = {};
-        if (accessToken) {
-            headers['Authorization'] = `Bearer ${accessToken}`;
-        }
+    async searchJobs(input: string): Promise<JobSearchResponse> {
         return this.makeRequest<JobSearchResponse>('/jobs/parse', {
             method: 'POST',
-            headers,
+            credentials: 'include',
             body: JSON.stringify({ input }),
         });
     }
 
-    async signIn(email: string): Promise<ApiResponse> {
-        return this.makeRequest<ApiResponse>('/auth/sign-in', {
+    async signIn(email: string): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/sign-in', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
         });
     }
 
-    async confirmSignIn(email: string, code: string): Promise<ApiResponse> {
-        return this.makeRequest<ApiResponse>('/auth/confirm', {
+    async confirmSignIn(email: string, code: string): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, code }),
         });
     }
 
-    async signOut(accessToken: string): Promise<ApiResponse> {
-        return this.makeRequest<ApiResponse>('/auth/sign-out', {
+    async signOut(): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/sign-out', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
+            credentials: 'include',
         });
     }
 }
