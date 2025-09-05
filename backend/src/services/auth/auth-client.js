@@ -45,10 +45,11 @@ class AuthClient {
      *
      * @param {string} _email - The email address of the user to confirm.
      * @param {string} _code - The confirmation code sent to the user's email.
+     * @param {string} _session - The session identifier from the initial sign-in attempt.
      * @throws {AuthServiceError} Throws if the method is not implemented by a subclass.
      * @returns {Promise<void>} Resolves when the sign in is confirmed.
      */
-    async confirmSignIn(_email, _code) {
+    async confirmSignIn(_email, _code, _session) {
         throw new AuthServiceError(ERROR_TYPES.NOT_IMPLEMENTED, "confirmSignIn() must be implemented by subclass", 501);
     }
 
