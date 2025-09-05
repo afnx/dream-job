@@ -25,20 +25,113 @@ class ZipRecruiterAdapter extends BaseSiteAdapter {
     }
 
     async dismissOverlays() {
-        // ZipRecruiter-specific modal dismissal by clicking in corner
-        const corner = Math.random() > 0.5 ? 'right' : 'left';
-        const viewportSize = this.page.viewportSize();
-        const x = corner === 'right'
-            ? Math.floor(viewportSize.width - Math.random() * 50 - 10)
-            : Math.floor(Math.random() * 50 + 10);
-        const y = Math.floor(Math.random() * 50 + 10);
+        try {
+            // Wait briefly to ensure any modals have time to appear
+            await randomDelay(500, 1000);
 
-        await this.page.mouse.move(x, y);
-        await humanDelay('click');
-        await this.page.mouse.down();
-        await randomDelay(50, 150);
-        await this.page.mouse.up();
-        await humanDelay('click');
+            // Check if modal is present using multiple possible selectors
+            const modalSelectors = [
+                '[role="dialog"][aria-modal="true"]',
+                '[data-zds-component="modal"]',
+                '.bg-black.bg-opacity-50.fixed.inset-0',
+                '[data-focus-lock-disabled="false"]'
+            ];
+
+            let modalFound = false;
+
+            for (const selector of modalSelectors) {
+                const modal = await this.page.$(selector);
+                if (modal) {
+                    modalFound = true;
+
+                    // Try multiple dismiss strategies
+                    // Press Escape key
+                    await this.page.keyboard.press('Escape');
+                    await randomDelay(300, 500);
+
+                    // Check if modal is still there
+                    const stillExists = await this.page.$(selector);
+                    if (!stillExists) {
+                        break;
+                    }
+
+                    // Click on backdrop (the semi-transparent overlay)
+                    const backdrop = await this.page.$('.bg-black.bg-opacity-50.fixed.inset-0');
+                    if (backdrop) {
+                        // Get backdrop bounds and click outside the modal content
+                        const backdropBox = await backdrop.boundingBox();
+                        if (backdropBox) {
+                            // Click in top-left corner of backdrop
+                            await this.page.mouse.click(
+                                backdropBox.x + 10,
+                                backdropBox.y + 10
+                            );
+                            await randomDelay(300, 500);
+
+                            const stillExists2 = await this.page.$(selector);
+                            if (!stillExists2) {
+                                break;
+                            }
+                        }
+                    }
+
+                    // Look for close button (X) - common patterns
+                    const closeSelectors = [
+                        'button[aria-label*="close"]',
+                        'button[aria-label*="Close"]',
+                        'button[title*="close"]',
+                        'button[title*="Close"]',
+                        '[data-testid*="close"]',
+                        '.close',
+                        '[aria-label="clear"]'
+                    ];
+
+                    for (const closeSelector of closeSelectors) {
+                        const closeBtn = await modal.$(closeSelector);
+                        if (closeBtn) {
+                            await closeBtn.click();
+                            await randomDelay(300, 500);
+
+                            const stillExists3 = await this.page.$(selector);
+                            if (!stillExists3) {
+                                modalFound = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!modalFound) break;
+
+                    // Click outside modal content area
+                    const modalContent = await modal.$('[role="dialog"]');
+                    if (modalContent) {
+                        const contentBox = await modalContent.boundingBox();
+
+                        if (contentBox) {
+                            // Click outside the modal content but within viewport
+                            const outsideX = Math.max(10, contentBox.x - 50);
+                            const outsideY = Math.max(10, contentBox.y - 50);
+
+                            await this.page.mouse.click(outsideX, outsideY);
+                            await randomDelay(300, 500);
+
+                            const stillExists4 = await this.page.$(selector);
+                            if (!stillExists4) {
+                                break;
+                            }
+                        }
+                    }
+
+                    break; // Exit the selector loop if we found a modal
+                }
+            }
+
+            // Add a small delay after dismissal
+            await humanDelay('click');
+
+        } catch {
+            // Don't throw - continue with scraping even if overlay dismissal fails
+        }
     }
 
     async simulateActivity() {

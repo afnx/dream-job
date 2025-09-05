@@ -42,5 +42,16 @@ module.exports = {
         port: parseInt(envVars.NEXT_JS_PORT),
         host: envVars.NEXT_JS_HOST,
         url: envVars.NEXT_JS_APP_URL
+    },
+
+    // Auth Configuration
+    auth: {
+        provider: envVars.AUTH_PROVIDER,
+        cognito: {
+            userPoolId: envVars.COGNITO_AUTH_USER_POOL_ID,
+            clientId: envVars.COGNITO_AUTH_CLIENT_ID,
+            clientSecret: envVars.COGNITO_AUTH_CLIENT_SECRET,
+            region: envVars.COGNITO_AUTH_REGION
+        }
     }
 };

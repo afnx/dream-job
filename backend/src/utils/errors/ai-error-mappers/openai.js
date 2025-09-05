@@ -11,7 +11,7 @@ function mapOpenAIError(error, config, context = 'OpenAI operation failed') {
         return new AIServiceError(
             ERROR_TYPES.AI_INVALID_API_KEY,
             'Invalid OpenAI API key. Please check your configuration.',
-            401
+            400
         );
 
     } else if (error.code === 'model_not_found') {

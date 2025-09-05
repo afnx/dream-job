@@ -1,5 +1,6 @@
 import { ErrorResponse } from "@/types/api";
 import { JobSearchResponse } from "@/types/job";
+import { AuthResponse } from "@/types/auth";
 import { ApiException } from "@/utils/errors";
 
 const API_BASE_URL = process.env.NODE_API_BASE_URL || 'http://localhost:5000/api/v1';
@@ -39,6 +40,11 @@ class ApiService {
             return data;
         } catch (error) {
             if (error instanceof ApiException) {
+                if (error.statusCode === 401) {
+                    // Dispatch a custom event to notify the app about auto sign-out
+                    window.dispatchEvent(new Event('autoSignOut'));
+                }
+
                 throw error;
             }
 
@@ -71,7 +77,38 @@ class ApiService {
     async searchJobs(input: string): Promise<JobSearchResponse> {
         return this.makeRequest<JobSearchResponse>('/jobs/parse', {
             method: 'POST',
+            credentials: 'include',
             body: JSON.stringify({ input }),
+        });
+    }
+
+    async signIn(email: string): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/sign-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+    }
+
+    async confirmSignIn(email: string, code: string, session: string): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code, session }),
+        });
+    }
+
+    async signOut(): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/sign-out', {
+            method: 'POST',
+            credentials: 'include',
+        });
+    }
+
+    async getCurrentUser(): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/me', {
+            method: 'GET',
+            credentials: 'include',
         });
     }
 }

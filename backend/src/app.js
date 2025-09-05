@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const routes = require('./routes');
 const env = require('./config/env');
 const errorHandler = require('./middleware/error-handler');
@@ -16,6 +17,7 @@ const corsOptions = {
 // Enable CORS for all routes
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
     res.send(`DreamJob API ${env.apiPrefix}`);
