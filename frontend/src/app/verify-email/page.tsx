@@ -89,30 +89,32 @@ export default function VerifyEmailPage() {
                     We’ve sent an 8-digit verification code to <span className="font-bold">{email}</span>.<br /><br />
                     Please enter it below to verify your email address.
                 </p>
-                <div className="flex justify-center gap-2 mt-8 mb-4">
-                    {[...Array(8)].map((_, idx) => (
-                        <input
-                            key={idx}
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={1}
-                            name={`code-${idx}`}
-                            className="w-10 h-14 text-center text-2xl border border-gray-300 rounded-lg focus:border-indigo-400 outline-none transition-colors"
-                            autoComplete="one-time-code"
-                            pattern="[0-9]*"
-                            required
-                            disabled={authLoading || loading}
-                            value={codeDigits[idx]}
-                            onChange={e => handleInputChange(idx, e.target.value)}
-                            onPaste={idx === 0 ? handlePaste : undefined}
-                            onKeyDown={e => {
-                                if (e.key === 'Backspace' && !e.currentTarget.value && idx > 0) {
-                                    const prev = document.querySelector<HTMLInputElement>(`input[name=code-${idx - 1}]`);
-                                    prev?.focus();
-                                }
-                            }}
-                        />
-                    ))}
+                <div className="flex justify-center gap-1 sm:gap-2 mb-4 max-w-full">
+                    <div className="flex gap-1 sm:gap-2 w-full sm:w-auto items-center justify-center">
+                        {[...Array(8)].map((_, idx) => (
+                            <input
+                                key={idx}
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={1}
+                                name={`code-${idx}`}
+                                className="w-8 h-10 sm:w-10 sm:h-14 text-center text-2xl border border-gray-300 rounded-lg focus:border-indigo-400 outline-none transition-colors"
+                                autoComplete="one-time-code"
+                                pattern="[0-9]*"
+                                required
+                                disabled={authLoading || loading}
+                                value={codeDigits[idx]}
+                                onChange={e => handleInputChange(idx, e.target.value)}
+                                onPaste={idx === 0 ? handlePaste : undefined}
+                                onKeyDown={e => {
+                                    if (e.key === 'Backspace' && !e.currentTarget.value && idx > 0) {
+                                        const prev = document.querySelector<HTMLInputElement>(`input[name=code-${idx - 1}]`);
+                                        prev?.focus();
+                                    }
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <FilledButton
                     type="submit"
