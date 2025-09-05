@@ -48,7 +48,6 @@ export function useJobSearch(): UseJobSearchResult {
                     setFieldErrors(err.getFieldErrors());
                 } else {
                     setError('An unexpected error occurred');
-                    console.error('Unexpected error:', err);
                 }
                 setJobs([]);
             } finally {
