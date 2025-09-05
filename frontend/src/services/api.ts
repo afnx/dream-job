@@ -40,6 +40,11 @@ class ApiService {
             return data;
         } catch (error) {
             if (error instanceof ApiException) {
+                if (error.statusCode === 401) {
+                    // Dispatch a custom event to notify the app about auto sign-out
+                    window.dispatchEvent(new Event('autoSignOut'));
+                }
+
                 throw error;
             }
 
@@ -85,17 +90,24 @@ class ApiService {
         });
     }
 
-    async confirmSignIn(email: string, code: string): Promise<AuthResponse> {
+    async confirmSignIn(email: string, code: string, session: string): Promise<AuthResponse> {
         return this.makeRequest<AuthResponse>('/auth/confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code }),
+            body: JSON.stringify({ email, code, session }),
         });
     }
 
     async signOut(): Promise<AuthResponse> {
         return this.makeRequest<AuthResponse>('/auth/sign-out', {
             method: 'POST',
+            credentials: 'include',
+        });
+    }
+
+    async getCurrentUser(): Promise<AuthResponse> {
+        return this.makeRequest<AuthResponse>('/auth/me', {
+            method: 'GET',
             credentials: 'include',
         });
     }
