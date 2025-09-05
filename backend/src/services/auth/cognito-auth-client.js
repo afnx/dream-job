@@ -58,8 +58,8 @@ class CognitoAuthClient extends AuthClient {
         } catch (error) {
             if (error.name !== "UsernameExistsException") {
                 throw new AuthServiceError(
-                    ERROR_TYPES.SIGN_UP_ERROR,
-                    'Sign-up failed: ' + error.message,
+                    ERROR_TYPES.SIGN_IN_ERROR,
+                    'Sign-in failed: ' + error.message,
                     500
                 );
             }
@@ -97,7 +97,7 @@ class CognitoAuthClient extends AuthClient {
             return { email: response.Username, accessToken: accessToken };
         } catch (error) {
             throw new AuthServiceError(
-                ERROR_TYPES.GET_USER_ERROR,
+                ERROR_TYPES.INTERNAL_SERVER_ERROR,
                 'Cannot retrieve your account information: ' + error.message,
                 500
             );
@@ -125,8 +125,8 @@ class CognitoAuthClient extends AuthClient {
             return { email: email, accessToken: AuthenticationResult.AccessToken };
         } catch (error) {
             throw new AuthServiceError(
-                ERROR_TYPES.CONFIRM_SIGN_UP_ERROR,
-                'Sign-up confirmation failed: ' + error.message,
+                ERROR_TYPES.SIGN_IN_ERROR,
+                'Sign-in confirmation failed: ' + error.message,
                 500
             );
         }

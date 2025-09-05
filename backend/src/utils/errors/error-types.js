@@ -71,6 +71,17 @@
  * @property {string} CONFIG_ERROR - There is a configuration error.
  * @property {string} UNSUPPORTED_PROVIDER - The provider is not supported.
  * @property {string} UNKNOWN_ERROR - An unknown error occurred.
+ * 
+ * @property {string} SIGN_IN_ERROR - Sign-in process failed.
+ * @property {string} SIGN_UP_ERROR - Sign-up process failed.
+ * @property {string} SIGN_OUT_ERROR - Sign-out process failed.
+ * @property {string} EMAIL_ALREADY_REGISTERED - The email is already registered.
+ * @property {string} EMAIL_NOT_VERIFIED - The email address has not been verified.
+ * @property {string} ACCOUNT_LOCKED - The user account is locked.
+ * @property {string} PASSWORD_RESET_ERROR - Password reset process failed.
+ * @property {string} PASSWORD_WEAK - The provided password is too weak.
+ * @property {string} VERIFICATION_CODE_INVALID - The verification code provided is invalid.
+ * @property {string} VERIFICATION_CODE_EXPIRED - The verification code has expired.
  */
 const ERROR_TYPES = {
     // Validation errors
@@ -147,7 +158,19 @@ const ERROR_TYPES = {
     INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
     CONFIG_ERROR: 'CONFIG_ERROR',
     UNSUPPORTED_PROVIDER: 'UNSUPPORTED_PROVIDER',
-    UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+
+    // Auth flow errors
+    SIGN_IN_ERROR: 'SIGN_IN_ERROR',
+    SIGN_UP_ERROR: 'SIGN_UP_ERROR',
+    SIGN_OUT_ERROR: 'SIGN_OUT_ERROR',
+    EMAIL_ALREADY_REGISTERED: 'EMAIL_ALREADY_REGISTERED',
+    EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+    ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
+    PASSWORD_RESET_ERROR: 'PASSWORD_RESET_ERROR',
+    PASSWORD_WEAK: 'PASSWORD_WEAK',
+    VERIFICATION_CODE_INVALID: 'VERIFICATION_CODE_INVALID',
+    VERIFICATION_CODE_EXPIRED: 'VERIFICATION_CODE_EXPIRED'
 };
 
 module.exports = ERROR_TYPES;
