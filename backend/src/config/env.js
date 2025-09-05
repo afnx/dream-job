@@ -50,6 +50,7 @@ module.exports = {
         cognito: {
             userPoolId: envVars.COGNITO_AUTH_USER_POOL_ID,
             clientId: envVars.COGNITO_AUTH_CLIENT_ID,
+            clientSecret: envVars.COGNITO_AUTH_CLIENT_SECRET,
             region: envVars.COGNITO_AUTH_REGION
         }
     }
