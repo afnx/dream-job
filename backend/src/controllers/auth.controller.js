@@ -22,6 +22,14 @@ exports.confirmSignIn = async (req, res, next) => {
         const authClient = authService.getAuthClient();
 
         const result = await authClient.confirmSignIn(email, code);
+
+        res.cookie('accessToken', result.accessToken, {
+            httpOnly: true,
+            secure: env.env === 'prod',
+            sameSite: 'none',
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
+
         success(res, result, 'Sign-in confirmed!');
     } catch (err) {
         next(err);
@@ -30,11 +38,18 @@ exports.confirmSignIn = async (req, res, next) => {
 
 exports.signOut = async (req, res, next) => {
     try {
-        const { accessToken } = req.body;
+        const accessToken = req.cookies['accessToken'];
         const authService = new AuthService(env.auth);
         const authClient = authService.getAuthClient();
 
         const result = await authClient.signOut(accessToken);
+
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: env.env === 'prod',
+            sameSite: 'none',
+        });
+
         success(res, result, 'Sign-out successful!');
     } catch (err) {
         next(err);
