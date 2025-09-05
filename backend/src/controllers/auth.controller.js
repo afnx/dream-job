@@ -17,11 +17,11 @@ exports.signInPasswordless = async (req, res, next) => {
 
 exports.confirmSignIn = async (req, res, next) => {
     try {
-        const { email, code } = req.body;
+        const { email, code, session } = req.body;
         const authService = new AuthService(env.auth);
         const authClient = authService.getAuthClient();
 
-        const result = await authClient.confirmSignIn(email, code);
+        const result = await authClient.confirmSignIn(email, code, session);
 
         res.cookie('accessToken', result.accessToken, {
             httpOnly: true,
@@ -51,6 +51,19 @@ exports.signOut = async (req, res, next) => {
         });
 
         success(res, result, 'Sign-out successful!');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getCurrentUser = async (req, res, next) => {
+    try {
+        const accessToken = req.cookies['accessToken'];
+        const authService = new AuthService(env.auth);
+        const authClient = authService.getAuthClient();
+
+        const user = await authClient.getUser(accessToken);
+        success(res, user, 'User fetched successfully!');
     } catch (err) {
         next(err);
     }
