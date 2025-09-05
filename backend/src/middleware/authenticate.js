@@ -4,7 +4,7 @@ const { ERROR_TYPES, AuthServiceError } = require('../utils/errors/index');
 
 
 exports.authenticate = async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies['accessToken'];
 
     if (!token) {
         return next(
