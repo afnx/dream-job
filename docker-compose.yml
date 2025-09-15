@@ -23,7 +23,6 @@ services:
       - .env
   db:
     image: postgres:latest
-    restart: always
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
     environment:
