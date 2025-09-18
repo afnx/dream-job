@@ -93,6 +93,7 @@ class JobRepository extends BaseRepository {
             remoteOption: job.remoteOption,
             postedAt: job.postedAt,
             link: job.link,
+            applyLink: job.applyLink,
             skills: job.skills,
             benefits: job.benefits,
             expiresAt: job.expiresAt,
@@ -120,7 +121,16 @@ class JobRepository extends BaseRepository {
      * @returns {Promise<Array<Object>>} A promise that resolves to an array of job objects matching the search criteria.
      */
     async searchJobs(query) {
-        const { keywords, location, experience, salaryMin, salaryMax, jobType, remoteOption, otherPreferences } = query;
+        const {
+            keywords,
+            location,
+            experience,
+            salaryMin,
+            salaryMax,
+            jobType,
+            remoteOption,
+            otherPreferences
+        } = query;
 
         const conditions = [
             keywords?.length ? {
