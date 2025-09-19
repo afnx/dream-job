@@ -60,7 +60,7 @@ class OpenAIClient extends AIClient {
         }
     }
 
-    async rankJobListings(userInput, jobListings) {
+    async rankJobListings(_userInput, _jobListings) {
         // TODO: Implement ranking logic using OpenAI
         throw new AIServiceError(
             ERROR_TYPES.NOT_IMPLEMENTED,
