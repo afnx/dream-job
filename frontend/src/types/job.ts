@@ -40,10 +40,15 @@ export interface Job {
     companyId?: string;
     location?: string;
     experience?: Experience;
-    salary?: string;
+    salaryRaw?: string;
+    salaryMin?: number;
+    salaryMax?: number;
+    salaryCurrency?: string;
+    salaryUnit?: string;
     jobType?: JobType;
     remoteOption?: RemoteOption;
     postedAt?: Date;
     link: string;
     applyLink?: string;
+    source?: string;
 }
