@@ -7,12 +7,12 @@ interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({ shrink = false, className = '', logoMargin = '' }) => (
-    <div className={className}>
+    <div className={`select-none ${className}`} style={{ userSelect: 'none' }}>
         <h1
             className={`
                 font-bold text-gray-900 ${!shrink ? 'mb-4' : ''}
                 ${shrink
-                    ? 'text-2xl md:text-4xl'
+                    ? 'text-3xl md:text-4xl '
                     : 'text-4xl md:text-6xl'
                 } ${logoMargin}
             `}
