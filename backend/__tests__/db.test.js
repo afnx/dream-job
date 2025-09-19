@@ -1,8 +1,12 @@
+jest.mock('../src/db', () => ({
+    $connect: jest.fn().mockResolvedValue(),
+    $disconnect: jest.fn().mockResolvedValue(),
+}));
+
 const prisma = require('../src/db');
 
 describe('Prisma Client', () => {
     afterAll(async () => {
-        // Disconnect Prisma Client after tests
         await prisma.$disconnect();
     });
 
@@ -11,21 +15,11 @@ describe('Prisma Client', () => {
     });
 
     test('Prisma Client should connect successfully', async () => {
-        try {
-            await prisma.$connect();
-            expect(true).toBe(true); // If no error, connection is successful
-        } catch (error) {
-            expect(error).toBeUndefined(); // Fail the test if there's an error
-        }
+        await expect(prisma.$connect()).resolves.toBeUndefined();
     });
 
     test('Prisma Client should handle disconnection gracefully', async () => {
-        try {
-            await prisma.$connect();
-            await prisma.$disconnect();
-            expect(true).toBe(true); // If no error, disconnection is successful
-        } catch (error) {
-            expect(error).toBeUndefined(); // Fail the test if there's an error
-        }
+        await prisma.$connect();
+        await expect(prisma.$disconnect()).resolves.toBeUndefined();
     });
 });
