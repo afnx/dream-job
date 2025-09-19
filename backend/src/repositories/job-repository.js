@@ -43,6 +43,7 @@ class JobRepository extends BaseRepository {
      * @param {number} [jobs[].salaryMax] - The maximum salary for the job.
      * @param {number} [jobs[].salaryRaw] - The raw salary value.
      * @param {string} [jobs[].salaryCurrency] - The currency of the salary.
+     * @param {string} [jobs[].salaryUnit] - The salary unit (e.g., per year, per hour).
      * @param {string} [jobs[].jobType] - The type of job (e.g., full-time, part-time).
      * @param {string} [jobs[].remoteOption] - The remote work option.
      * @param {string} [jobs[].link] - The URL to the job posting.
@@ -50,6 +51,7 @@ class JobRepository extends BaseRepository {
      * @param {Array<string>} [jobs[].benefits] - An array of benefits offered by the job.
      * @param {Date|string} [jobs[].expiresAt] - The expiration date of the job posting.
      * @param {string} [jobs[].source] - The source of the job posting (e.g., website, referral).
+     * @param {string} [jobs[].sourceId] - The unique identifier from the source.
      * @throws {Error} If the input is not a non-empty array.
      * @returns {Promise<Object>} The result of the bulk creation operation.
      */
@@ -58,50 +60,94 @@ class JobRepository extends BaseRepository {
             throw new Error('Invalid input: jobs must be a non-empty array');
         }
 
-        const jobsWithCompanyIds = [];
+        // Remove duplicate sourceIds from input array
+        const seen = new Set();
+        const uniqueJobs = jobs.filter(job => {
+            if (!job.sourceId || !job.source) return false; // Skip jobs without sourceId
+            const key = `${job.sourceId}|${job.source}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
 
-        // Ensure each job has a valid company ID
-        for (const job of jobs) {
-            let company = await this.companyRepository.findByName(job.company.name);
+        // Find existing jobs in the database
+        const sourceIdPairs = uniqueJobs.map(job => ({
+            sourceId: job.sourceId,
+            source: job.source
+        }));
 
-            // If the company does not exist, create it
+        // Find existing jobs in the database
+        let existingJobs = [];
+        if (sourceIdPairs.length > 0) {
+            existingJobs = await this.findMany(
+                {
+                    // Find existing jobs by sourceId and source
+                    OR: sourceIdPairs.map(pair => ({
+                        sourceId: { equals: pair.sourceId },
+                        source: { equals: pair.source }
+                    }))
+                },
+                { select: { id: true, source: true, sourceId: true } } // Only select necessary fields
+            );
+        }
+
+        const existingSourceIdMap = new Map(
+            existingJobs.map(job => [`${job.sourceId}|${job.source}`, job])
+        );
+
+        const jobsToUpdate = [];
+        const jobsToCreate = [];
+
+        for (const job of uniqueJobs) {
+            // Ensure the associated company exists or create it
+            let company = await this.companyRepository.findCompanyByName(job.company.name);
             if (!company) {
                 company = await this.companyRepository.create(job.company);
             }
 
-            // Add the company ID to the job object
-            jobsWithCompanyIds.push({
-                ...job,
-                companyId: company.id
-            });
+            const jobData = {
+                title: job.title,
+                description: job.description,
+                companyId: company.id,
+                location: job.location,
+                experience: job.experience,
+                salaryMin: job.salaryMin,
+                salaryMax: job.salaryMax,
+                salaryRaw: job.salaryRaw,
+                salaryCurrency: job.salaryCurrency,
+                salaryUnit: job.salaryUnit,
+                jobType: job.jobType,
+                remoteOption: job.remoteOption,
+                postedAt: job.postedAt,
+                link: job.link || job.source || "#",
+                applyLink: job.applyLink,
+                skills: job.skills || [],
+                benefits: job.benefits || [],
+                expiresAt: job.expiresAt,
+                source: job.source,
+                sourceId: job.sourceId,
+            };
+
+            // Determine if we need to update an existing job or create a new one
+            const key = `${job.sourceId}|${job.source}`;
+            if (existingSourceIdMap.has(key)) {
+                jobsToUpdate.push({ id: existingSourceIdMap.get(key).id, data: jobData });
+            } else {
+                jobsToCreate.push(jobData);
+            }
         }
 
-        // Prepare the job data for bulk creation
-        jobs = jobsWithCompanyIds;
+        // Update existing jobs and create new jobs in parallel
+        await Promise.all([
+            jobsToUpdate.length > 0
+                ? Promise.all(jobsToUpdate.map(job => this.update(job.id, job.data)))
+                : Promise.resolve(),
+            jobsToCreate.length > 0
+                ? this.createMany(jobsToCreate)
+                : Promise.resolve()
+        ]);
 
-        const jobData = jobs.map(job => ({
-            title: job.title,
-            description: job.description,
-            companyId: job.companyId,
-            location: job.location,
-            experience: job.experience,
-            salaryMin: job.salaryMin,
-            salaryMax: job.salaryMax,
-            salaryRaw: job.salaryRaw,
-            salaryCurrency: job.salaryCurrency,
-            jobType: job.jobType,
-            remoteOption: job.remoteOption,
-            postedAt: job.postedAt,
-            link: job.link,
-            skills: job.skills,
-            benefits: job.benefits,
-            expiresAt: job.expiresAt,
-            source: job.source,
-        }));
-
-        return await this.createMany({
-            data: jobData
-        });
+        return { updated: jobsToUpdate.length, created: jobsToCreate.length };
     }
 
     /**
@@ -112,66 +158,75 @@ class JobRepository extends BaseRepository {
      * @param {Array<string>} [query.keywords] - Keywords to search for in job postings.
      * @param {string} [query.location] - Location to filter jobs by.
      * @param {string} [query.experience] - Experience level to filter jobs by.
-     * @param {number} [query.salary_min] - Minimum salary to filter jobs by.
-     * @param {number} [query.salary_max] - Maximum salary to filter jobs by.
-     * @param {string} [query.job_type] - Type of job (e.g., full-time, part-time).
-     * @param {string} [query.remote_option] - Remote work option to filter jobs by.
-     * @param {Array<string>} [query.other_preferences] - Additional preferences for job search.
+     * @param {number} [query.salaryMin] - Minimum salary to filter jobs by.
+     * @param {number} [query.salaryMax] - Maximum salary to filter jobs by.
+     * @param {string} [query.jobType] - Type of job (e.g., full-time, part-time).
+     * @param {string} [query.remoteOption] - Remote work option to filter jobs by.
+     * @param {Array<string>} [query.otherPreferences] - Additional preferences for job search.
      * @returns {Promise<Array<Object>>} A promise that resolves to an array of job objects matching the search criteria.
      */
     async searchJobs(query) {
-        const { keywords, location, experience, salaryMin, salaryMax, jobType, remoteOption, otherPreferences } = query;
+        const {
+            keywords,
+            location,
+            experience,
+            salaryMin,
+            salaryMax,
+            jobType,
+            remoteOption,
+            otherPreferences
+        } = query;
 
-        const conditions = [
+        // Flatten keywords and remove duplicates
+        const searchTerms = keywords
+            ? Array.from(new Set(keywords.flatMap(k => k.split(' ')).map(w => w.trim()).filter(Boolean)))
+            : [];
+
+        const buildConditions = (relaxed = false) => [
             keywords?.length ? {
-                OR: [
-                    {
-                        title: {
-                            search: keywords.join(" & "),
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        description: {
-                            search: keywords.join(" & "),
-                            mode: 'insensitive'
-                        }
-                    }
-                ]
-            } : null,
-            remoteOption ? {
-                remoteOption: {
-                    equals: remoteOption,
-                    mode: 'insensitive'
-                }
-            } : null,
-            experience ? {
-                experience: {
-                    equals: experience,
-                    mode: 'insensitive'
-                }
-            } : null,
-            otherPreferences?.length ? {
-                otherPreferences: {
-                    search: otherPreferences.join(" | "),
-                    mode: 'insensitive'
-                }
+                OR: searchTerms.flatMap(term => [
+                    { title: { contains: term, mode: 'insensitive' } },
+                    { description: { contains: term, mode: 'insensitive' } }
+                ])
             } : null,
             location ? { location: { contains: location, mode: 'insensitive' } } : null,
-            jobType ? { jobType: { equals: jobType, mode: 'insensitive' } } : null,
-            salaryMin ? { salary: { gte: salaryMin } } : null,
-            salaryMax ? { salary: { lte: salaryMax } } : null
+            !relaxed && remoteOption ? {
+                remoteOption: { equals: remoteOption.toUpperCase() }
+            } : null,
+            !relaxed && experience ? {
+                experience: { equals: experience.toUpperCase() }
+            } : null,
+            !relaxed && otherPreferences?.length ? {
+                benefits: { hasSome: otherPreferences }
+            } : null,
+            !relaxed && jobType ? { jobType: { equals: jobType.toUpperCase() } } : null,
+            !relaxed && salaryMin ? { salaryMin: { gte: salaryMin } } : null,
+            !relaxed && salaryMax ? { salaryMax: { lte: salaryMax } } : null
         ].filter(Boolean);
 
-        return await this.findMany({
-            AND: conditions
-        }, {
-            _relevance: {
-                fields: ['title', 'description', 'location', 'experienceLevel', 'salary', 'jobType', 'remoteOption'],
-                search: keywords ? keywords.join(" | ") : '',
-                sort: 'asc',
-            },
-        });
+        const validSearch = searchTerms.filter(term => !term.includes(' ')).join(' | ');
+        const options = keywords?.length ? {
+            orderBy: {
+                _relevance: {
+                    fields: ['title', 'description', 'location'],
+                    search: validSearch,
+                    sort: 'desc',
+                }
+            }
+        } : {};
+
+        // Always include company details in the results
+        const includeCompany = { include: { company: true } };
+
+        // First, strict search
+        let results = await this.findMany({ AND: buildConditions(false) }, { ...options, ...includeCompany });
+
+        // If no results, relax filters
+        if (results.length === 0) {
+            results = await this.findMany({ AND: buildConditions(true) }, { ...options, ...includeCompany });
+        }
+
+        return results;
     }
 }
 

@@ -96,106 +96,32 @@ jobs:
       )
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json', '**/.env.example') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile', '**/docker-compose.yml', '**/package*.json', '**/.env.example') }}-
-            ${{ runner.os }}-buildx-
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
-      - name: Build backend Docker image with buildx
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          load: true
-          tags: |
-            dream-job-backend:${{ github.sha }}
-            dream-job-backend:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-      - name: Build frontend Docker image with buildx
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          load: true
-          tags: |
-            dream-job-frontend:${{ github.sha }}
-            dream-job-frontend:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-      - name: Create .env file
-        run: cp .env.example .env
-
-      - name: Start services
-        run: |
-          docker compose --profile dev -f docker-compose.yml up -d
-          
-      - name: Wait for database to be ready
-        run: |
-          echo "Waiting for database to be ready..."
-          timeout 120s bash -c '
-            until docker exec $(docker compose ps -q db) pg_isready > /dev/null 2>&1; do
-              echo "Database not ready, waiting..."
-              sleep 2
-            done
-          '
-          echo "Database is ready!"
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
 
       - name: Run backend tests
-        run: |
+        working-directory: ./backend
+        run: npm test
 
-          CONTAINER_NAME=$(docker compose ps -q backend)
-          docker exec $CONTAINER_NAME npm test
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
 
       - name: Run frontend tests
-        run: |
-          CONTAINER_NAME=$(docker compose ps -q frontend)
-          docker exec $CONTAINER_NAME npm test
-
-      - name: Collect logs on failure
-        if: failure()
-        run: |
-          echo "=== Collecting service logs ==="
-          echo "=== Backend Logs ==="
-          docker compose logs backend || echo "No backend logs available"
-          echo ""
-          echo "=== Frontend Logs ==="
-          docker compose logs frontend || echo "No frontend logs available"
-          echo ""
-          echo "=== Database Logs ==="
-          docker compose logs db || echo "No database logs available"
-          echo ""
-          echo "=== Docker ps ==="
-          docker compose ps
-          echo ""
-          echo "=== Docker system info ==="
-          docker system df
-
-      - name: Clean up Docker containers
-        if: always()
-        run: |
-          echo "Stopping services..."
-          docker compose -f docker-compose.yml down -v --remove-orphans --timeout 30 || true
-          
-          # Clean up specific images to avoid removing cached layers
-          docker rmi dream-job-backend:latest dream-job-frontend:latest || true
-          
-          # Prune only dangling resources
-          docker system prune -f --volumes || true
+        working-directory: ./frontend
+        run: npm test

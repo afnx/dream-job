@@ -1,9 +1,10 @@
 const { OpenAI } = require("openai");
+const { zodTextFormat } = require("openai/helpers/zod");
+
 const AIClient = require("./ai-client");
 const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
 const mapOpenAIError = require("../../utils/errors/ai-error-mappers/openai");
-const adaptJobQueryResponse = require('../../utils/ai-response-parsers/job-query-adapter');
-const adaptJobRankingResponse = require('../../utils/ai-response-parsers/job-ranking-adapter');
+const JobQuerySchema = require("../../schemas/job-query.schema");
 
 
 /**
@@ -34,64 +35,38 @@ class OpenAIClient extends AIClient {
 
     async extractJobQueryDetails(userInput) {
         try {
-            const prompt = `Extract the job title keywords, location, experience, salary, job type, and work preferences from this user input:
-            "${userInput}"
-            Return in JSON format:
-            {
-                "keywords": [...], // Array of keywords related to the job title
-                "location": "...", // Location for the job search (e.g., "New York", "San Francisco, CA", "California", "remote", or null if not specified)
-                "experience": "...", // Experience level (e.g., "entry-level", "mid-level", "senior-level", or null if not specified)
-                "salaryMin": ..., // Minimum salary expectation (e.g., 50000, or null if not specified)
-                "salaryMax": ..., // Maximum salary expectation (e.g., 100000, or null if not specified)
-                "salaryCurrency": "USD", // Currency for the salary (e.g., "USD", "EUR", or null if not specified)
-                "jobType": "...", // Job type (e.g., "full-time", "part-time", "contract", "temporary", "internship", or null if not specified)
-                "remoteOption": "...",  // Remote work options ("remote", "onsite", "hybrid", or null if not specified)
-                "otherPreferences": [...] // Array of any other preferences or requirements
-            }`;
-
-            const response = await this.openai.chat.completions.create({
+            const response = await this.openai.responses.parse({
                 model: this.model,
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 500,
-                temperature: 0.3,
+                max_output_tokens: 10000,
+                input: [
+                    {
+                        role: "system",
+                        content: "Extract the job information."
+                    },
+                    {
+                        role: "user",
+                        content: `${userInput}`,
+                    },
+                ],
+                text: {
+                    format: zodTextFormat(JobQuerySchema, "jobQuery"),
+                },
             });
 
-            return adaptJobQueryResponse(response, 'openai');
-
+            const jobQueryDetails = response.output_parsed;
+            return jobQueryDetails;
         } catch (error) {
             throw mapOpenAIError(error, this.config, 'Failed to extract job query details');
         }
     }
 
-    async rankJobListings(userInput, jobListings) {
-        try {
-            const prompt = `User input: "${userInput}"
-                Here are job listings:
-                ${JSON.stringify(jobListings, null, 2)}
-
-                Rank them by best match. Return JSON like this:
-                [
-                {
-                    "id": "job_123",
-                    "ranking": 1,
-                    "title": "...",
-                    "company": "...",
-                    "reason": "..."
-                }
-                ]`;
-
-            const response = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 1500,
-                temperature: 0.3,
-            });
-
-            return adaptJobRankingResponse(response, 'openai');
-
-        } catch (error) {
-            throw mapOpenAIError(error, this.config, 'Failed to rank job listings');
-        }
+    async rankJobListings(_userInput, _jobListings) {
+        // TODO: Implement ranking logic using OpenAI
+        throw new AIServiceError(
+            ERROR_TYPES.NOT_IMPLEMENTED,
+            'Job ranking is not yet implemented for OpenAIClient.',
+            501
+        );
     }
 }
 

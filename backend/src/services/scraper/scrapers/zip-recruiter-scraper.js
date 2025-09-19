@@ -23,6 +23,7 @@ class ZipRecruiterScraper extends BaseScraper {
     constructor(options = {}) {
         super(options);
         this.baseUrl = 'https://www.ziprecruiter.com/jobs-search';
+        this.jobBaseUrl = 'https://www.ziprecruiter.com/ojob/[company_name]?lvk=[job_id].current';
 
         this.selectors = {
             jobCards: 'article[id^="job-card-"], div[id^="job-card-"]',
@@ -81,15 +82,11 @@ class ZipRecruiterScraper extends BaseScraper {
 
             await adapter.dismissOverlays();
             await adapter.simulateActivity();
-
             await adapter.waitForJobElements();
 
             const jobElementIds = await adapter.getJobElementIds();
 
-            console.log(`[ZipRecruiterScraper] Found ${jobElementIds.length} possible jobs.`);
-
             const jobs = [];
-
             for (const elementId of jobElementIds) {
                 const job = await this.extractJob(page, elementId);
                 if (job) {
@@ -98,8 +95,6 @@ class ZipRecruiterScraper extends BaseScraper {
 
                 await randomDelay(200, 500);
             }
-
-            console.log(`[ZipRecruiterScraper] Scraping completed. Extracted ${jobs.length} jobs.`);
 
             return jobs;
         } catch (error) {
@@ -144,9 +139,20 @@ class ZipRecruiterScraper extends BaseScraper {
 
         if (job) {
             const jobIdMatch = elementId.match(/job-card-(.+)/);
-            if (jobIdMatch) job.jobId = jobIdMatch[1];
+            if (jobIdMatch) {
+                job.jobId = jobIdMatch[1];
 
-            job.jobUrl = page.url();
+                if (job.jobId && job.company) {
+                    const companySlug = job.company.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    job.link = this.jobBaseUrl
+                        .replace('[company_name]', companySlug)
+                        .replace('[job_id]', job.jobId);
+                } else {
+                    job.link = page.url();
+                }
+            }
+
+
 
         }
 
@@ -206,9 +212,13 @@ class ZipRecruiterScraper extends BaseScraper {
                 postedDate = parseRelativeDate(postedText);
             }
 
+            // Static source identifier
+            const source = 'ZipRecruiter';
+
             return {
                 title, company, location, remoteOption, salary, jobType,
-                descriptionHTML, description, postedDate, applyLink, companyAbout
+                descriptionHTML, description, postedDate, applyLink, companyAbout,
+                source
             };
         }, [this.selectors]);
     }
@@ -224,10 +234,11 @@ class ZipRecruiterScraper extends BaseScraper {
      */
     buildUrl(query) {
         const { keywords, location } = query;
-        const params = new URLSearchParams({
-            search: keywords,
-            location: location,
-        });
+        const params = new URLSearchParams();
+        params.set('search', keywords);
+        if (location != null) {
+            params.set('location', location);
+        }
         return `${this.baseUrl}?${params.toString()}`;
     }
 }

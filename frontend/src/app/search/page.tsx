@@ -5,6 +5,8 @@ import { SearchInput } from '@/components/search/SearchInput';
 import { useJobSearch } from '@/hooks/useJobSearch';
 import Logo from '@/components/Logo';
 import LogOutButton from '@/components/search/LogOutButton';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
+
 
 export default function Home() {
   const { jobs, isLoading, error, fieldErrors, searchQuery, setSearchQuery } = useJobSearch();
@@ -50,6 +52,7 @@ export default function Home() {
           searchQuery={searchQuery}
         />
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }

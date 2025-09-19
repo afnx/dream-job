@@ -21,6 +21,7 @@ model Job {
   salaryMax      Int?
   salaryRaw      String?
   salaryCurrency String?
+  salaryUnit     SalaryUnit?
   jobType        JobType?
   remoteOption   RemoteOption?
   postedAt       DateTime?
@@ -30,8 +31,9 @@ model Job {
   benefits       String[]
   expiresAt      DateTime?
 
-  source  String?
-  rawData Json?
+  source   String?
+  sourceId String? @unique
+  rawData  Json?
 
   searchVector Unsupported("tsvector")?
 
@@ -79,4 +81,12 @@ enum RemoteOption {
   REMOTE
   HYBRID
   ONSITE
+}
+
+enum SalaryUnit {
+  YEAR
+  MONTH
+  WEEK
+  DAY
+  HOUR
 }
