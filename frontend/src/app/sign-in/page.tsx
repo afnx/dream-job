@@ -50,7 +50,7 @@ export default function SignInPage() {
                 className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-2 border-indigo-300 shadow-lg"
             >
                 <Logo shrink={true} />
-                <h2 className="text-center m-0 text-[#3a3a3a]">Please sign in with your email address</h2>
+                <h2 className="text-center m-0 text-[#3a3a3a]">Please sign in with your email address<br />(invite-only)</h2>
                 <input
                     type="email"
                     name="email"
