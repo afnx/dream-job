@@ -143,7 +143,7 @@ class ZipRecruiterScraper extends BaseScraper {
                 job.jobId = jobIdMatch[1];
 
                 if (job.jobId && job.company) {
-                    const companySlug = job.company.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+                    const companySlug = job.company.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                     job.link = this.jobBaseUrl
                         .replace('[company_name]', companySlug)
                         .replace('[job_id]', job.jobId);
@@ -234,10 +234,11 @@ class ZipRecruiterScraper extends BaseScraper {
      */
     buildUrl(query) {
         const { keywords, location } = query;
-        const params = new URLSearchParams({
-            search: keywords,
-            location: location,
-        });
+        const params = new URLSearchParams();
+        params.set('search', keywords);
+        if (location != null) {
+            params.set('location', location);
+        }
         return `${this.baseUrl}?${params.toString()}`;
     }
 }
