@@ -38,8 +38,7 @@ class OpenAIClient extends AIClient {
         try {
             const response = await this.openai.responses.parse({
                 model: this.model,
-                max_output_tokens: 500,
-                temperature: 0.3,
+                max_output_tokens: 10000,
                 input: [
                     {
                         role: "system",
@@ -63,34 +62,12 @@ class OpenAIClient extends AIClient {
     }
 
     async rankJobListings(userInput, jobListings) {
-        try {
-            const prompt = `User input: "${userInput}"
-                Here are job listings:
-                ${JSON.stringify(jobListings, null, 2)}
-
-                Rank them by best match. Return JSON like this:
-                [
-                {
-                    "id": "job_123",
-                    "ranking": 1,
-                    "title": "...",
-                    "company": "...",
-                    "reason": "..."
-                }
-                ]`;
-
-            const response = await this.openai.chat.completions.create({
-                model: this.model,
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 1500,
-                temperature: 0.3,
-            });
-
-            return adaptJobRankingResponse(response, 'openai');
-
-        } catch (error) {
-            throw mapOpenAIError(error, this.config, 'Failed to rank job listings');
-        }
+        // TODO: Implement ranking logic using OpenAI
+        throw new AIServiceError(
+            ERROR_TYPES.NOT_IMPLEMENTED,
+            'Job ranking is not yet implemented for OpenAIClient.',
+            501
+        );
     }
 }
 
