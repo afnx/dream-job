@@ -9,7 +9,7 @@ interface LoadingTextProps {
 }
 
 const loadingMessages = [
-    { text: "Analyzing your input", duration: 4000 },
+    { text: "Analyzing your input", duration: 8000 },
     { text: "Finding jobs", duration: 6000 },
     { text: "Extracting job details", duration: 8000 },
     { text: "Processing results", duration: 8000 },
