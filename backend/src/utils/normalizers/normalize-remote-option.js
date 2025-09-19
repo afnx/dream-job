@@ -6,8 +6,8 @@ function normalizeRemoteOption(raw) {
     // Patterns for matching remote options
     const patterns = [
         { regex: /\b(remote|remote work|work from home|wfh)\b/, value: 'REMOTE' },
-        { regex: /\b(hybrid|partially remote|remote onsite|remote\/onsite|onsite\/remote)\b/, value: 'HYBRID' },
-        { regex: /\b(onsite only|onsite|work in office|in office|office only)\b/, value: 'ONSITE' },
+        { regex: /\b(hybrid|partially remote|remote onsite|remote on-site|remote\/onsite|remote\/on-site|onsite\/remote|on-site\/remote)\b/, value: 'HYBRID' },
+        { regex: /\b(onsite only|onsite|on-site only|on-site|work in office|in office|office only)\b/, value: 'ONSITE' },
     ];
 
     for (const { regex, value } of patterns) {
