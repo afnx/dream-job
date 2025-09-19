@@ -4,7 +4,7 @@ const ScraperService = require('../scraper/scraper-service');
 const { AppError, ERROR_TYPES } = require('../../utils/errors');
 const JobQuerySchema = require('../../schemas/job-query.schema');
 const JobSchema = require('../../schemas/job.schema');
-const { normalizeJobData } = require('../../utils/normalizers');
+const { normalizeJobData, normalizeJobQuery } = require('../../utils/normalizers');
 
 /**
  * Service class for handling job operations.
@@ -46,12 +46,13 @@ class JobService {
         const aiClient = this.aiService.getAIClient();
         const aiResult = await aiClient.extractJobQueryDetails(input);
 
-        if (!aiResult || !aiResult.query) {
-            throw new AppError(ERROR_TYPES.BAD_REQUEST, 'AI did not return a valid job query');
+        if (!aiResult) {
+            throw new AppError(ERROR_TYPES.BAD_REQUEST, 'Failed to analyze your input for job search');
         }
 
-        // Validate and normalize the extracted job query
-        const parsedQuery = JobQuerySchema.parse(aiResult);
+        // Normalize and parse the extracted job query
+        const normalizedQuery = normalizeJobQuery(aiResult);
+        const parsedQuery = JobQuerySchema.parse(normalizedQuery);
 
         // Search for jobs in the repository
         const savedJobs = await this.jobRepository.searchJobs(parsedQuery);
@@ -61,7 +62,7 @@ class JobService {
         }
 
         // If not enough jobs found in the repository, scrape jobs from job boards
-        if (jobs.length < 20) {
+        if (jobs.length < 15) {
             const scrapedJobs = await this.scraperService.scrapeJobs({
                 keywords: parsedQuery.keywords,
                 location: parsedQuery.location,
