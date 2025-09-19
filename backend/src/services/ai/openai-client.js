@@ -4,7 +4,6 @@ const { zodTextFormat } = require("openai/helpers/zod");
 const AIClient = require("./ai-client");
 const { AIServiceError, ERROR_TYPES } = require("../../utils/errors");
 const mapOpenAIError = require("../../utils/errors/ai-error-mappers/openai");
-const adaptJobRankingResponse = require('../../utils/ai-response-parsers/job-ranking-adapter');
 const JobQuerySchema = require("../../schemas/job-query.schema");
 
 
