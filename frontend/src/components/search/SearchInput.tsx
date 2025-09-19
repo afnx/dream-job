@@ -67,7 +67,16 @@ export function SearchInput({
                         className="w-full pl-6 pr-12 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-colors bg-white shadow-sm resize-none min-h-[60px]"
                         disabled={isLoading}
                         rows={isFocused ? 6 : 1}
-                        style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        style={{
+                            ...(!isFocused
+                                ? {
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    resize: 'none',
+                                }
+                                : {}),
+                        }}
                     />
 
                     <button
