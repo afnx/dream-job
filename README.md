@@ -122,13 +122,13 @@ Start all services with Docker Compose:
 
 ```bash
 # Start all services
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
 ```
 
 > 🎉 **That's it!** Your Dream Job application should now be running at `http://localhost:3000`
@@ -200,7 +200,7 @@ dream-job/
 │   │   ├── components/       # React components
 │   │   └── hooks/            # Custom React hooks
 │   └── public/               # Static assets
-└── docker-compose.yml        # Container orchestration
+└── compose.yaml              # Container orchestration
 ```
 
 ## Supported Platforms
@@ -265,13 +265,13 @@ We welcome contributions from developers of all skill levels!
 
 ```bash
 # View backend logs
-docker-compose logs backend
+docker compose logs backend
 
 # View frontend logs  
-docker-compose logs frontend
+docker compose logs frontend
 
 # View all logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ---
