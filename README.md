@@ -8,8 +8,8 @@
 
 [![License](https://img.shields.io/badge/License-BSL%201.1-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-17+-black.svg)](https://nextjs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://postgresql.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-v15+-black.svg)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v17+-blue.svg)](https://postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-enabled-blue.svg)](https://docker.com/)
 
 [✨ Features](#features) • [🚀 Quick Start](#quick-start) • [📖 Configuration](#configuration) • [🤝 Contributing](#contributing)
