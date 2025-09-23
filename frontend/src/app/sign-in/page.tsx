@@ -47,7 +47,7 @@ export default function SignInPage() {
         <div className="min-h-screen flex items-center justify-center gradient-bg">
             <form
                 onSubmit={handleSubmit}
-                className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-2 border-indigo-300 shadow-lg"
+                className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-1 border-gray-100 shadow-lg"
             >
                 <Logo shrink={true} />
                 <h2 className="text-center m-0 text-[#3a3a3a]">Please sign in with your email address<br />(invite-only)</h2>

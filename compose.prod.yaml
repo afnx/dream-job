@@ -1,0 +1,34 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: ${ENV}
+    ports:
+      - "${NEXT_JS_PORT}:3000"
+    env_file:
+      - .env
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${ENV}
+    ports:
+      - "${NODE_PORT}:5000"
+    env_file:
+      - .env
+  db:
+    image: postgres:latest
+    ports:
+      - "${DATABASE_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+volumes:
+  db_data:

@@ -3,19 +3,21 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
+      target: ${ENV}
     ports:
       - "${NEXT_JS_PORT}:3000"
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
-      - /app/.next
     env_file:
       - .env
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${ENV}
     ports:
-      - "${NODE_PORT}:${NODE_PORT}"
+      - "${NODE_PORT}:5000"
     volumes:
       - ./backend:/app
       - backend_node_modules:/app/node_modules
@@ -24,7 +26,7 @@ services:
   db:
     image: postgres:latest
     ports:
-      - "${DATABASE_PORT}:${DATABASE_PORT}"
+      - "${DATABASE_PORT}:5432"
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
