@@ -25,10 +25,10 @@ const FilledButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & Fil
     ) : (
         <button
             type="submit"
-            className={`py-3 px-4 rounded-lg border-none font-semibold text-base transition-colors
+            className={`py-3 px-4 rounded-lg border-none font-semibold text-base transition-colors duration-200
             ${isDisabled
-                    ? 'bg-gray-100 text-gray-400'
-                    : 'bg-gradient-to-r from-indigo-500 to-blue-400 text-white cursor-pointer'
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-indigo-500 to-blue-400 text-white cursor-pointer hover:from-indigo-600 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-400'
                 }`}
             disabled={isDisabled}
             {...props}
