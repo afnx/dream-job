@@ -122,7 +122,7 @@ Start all services with Docker Compose:
 
 ```bash
 # Start all services
-docker-compose --profile dev up -d
+docker-compose up -d
 
 # View logs
 docker-compose logs -f
