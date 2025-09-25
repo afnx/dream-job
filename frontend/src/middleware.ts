@@ -14,18 +14,23 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const accessToken = request.cookies.get('accessToken');
+    const rawCurrentUser = request.cookies.get('currentUser');
     const pendingEmail = request.cookies.get('pendingEmail');
 
+    // Parse currentUser cookie
+    const currentUser = rawCurrentUser ? JSON.parse(rawCurrentUser.value) : null;
+    // Determine if user is signed in based on presence of email
+    const signedIn = !!currentUser?.email;
+
     // If authenticated, prevent access to sign-in and verify-email
-    if (accessToken && (pathname === '/sign-in' || pathname === '/verify-email')) {
+    if (signedIn && (pathname === '/sign-in' || pathname === '/verify-email')) {
         const url = request.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);
     }
 
     // If not authenticated
-    if (!accessToken) {
+    if (!signedIn) {
         // If pendingEmail, always redirect to /verify-email
         if (pendingEmail) {
             if (pathname !== '/verify-email') {

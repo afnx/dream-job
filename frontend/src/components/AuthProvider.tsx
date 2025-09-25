@@ -3,8 +3,12 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { apiService } from '@/services/api';
 import { ApiException } from '@/utils/errors';
+import {
+    getCookie, setCookie, deleteCookie, clearCookies, setSessionStorage,
+    removeSessionStorage, getSessionStorage, clearLocalStorage, clearSessionStorage
+} from '@/utils/storage';
 
-type User = { email: string, accessToken: string | null } | null;
+type User = { email: string } | null;
 
 interface AuthContextType {
     currentUser: User;
@@ -41,22 +45,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {
             handleError(err);
         } finally {
-            document.cookie.split(';').forEach(cookie => {
-                const eqPos = cookie.indexOf('=');
-                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-                document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-            });
-            localStorage.clear();
-            sessionStorage.clear();
-
-            setLoading(false);
+            // Clear user data and cookies
+            clearCookies();
+            clearSessionStorage();
+            clearLocalStorage();
 
             // Redirect to home page after sign out
             window.location.href = '/';
+
+
+            // Wait a short moment to hide loading state
+            setTimeout(() => {
+                setLoading(false);
+            }, 700);
         }
     }, []);
 
     useEffect(() => {
+        // Listen for autoSignOut event
+        // This event is triggered when the user is automatically signed out
         function handleAutoSignOut() {
             signOut();
         }
@@ -65,8 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [signOut]);
 
     useEffect(() => {
-        // Try to restore user from localStorage
-        const storedUser = localStorage.getItem('currentUser');
+        // Try to restore user from cookies on initial load
+        const storedUser = getCookie('currentUser');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
@@ -84,12 +91,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (!authData.email) throw new Error('No email received');
                 if (!authData.session) throw new Error('No session received');
 
-                setUser({ email: authData.email, accessToken: null }); // Awaiting confirmation
-                sessionStorage.setItem('pendingEmail', authData.email);
-                sessionStorage.setItem('pendingSession', authData.session);
+                setSessionStorage('pendingEmail', authData.email);
+                setSessionStorage('pendingSession', authData.session);
 
                 // Set pendingEmail cookie for middleware
-                document.cookie = `pendingEmail=${encodeURIComponent(authData.email)}; path=/; SameSite=Lax`;
+                setCookie('pendingEmail', authData.email, 1);
             }
         } catch (err) {
             handleError(err);
@@ -103,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(null);
 
         try {
-            const session = sessionStorage.getItem('pendingSession') || '';
+            const session = getSessionStorage('pendingSession');
             if (!session) throw new Error('No session found');
 
             const response = await apiService.confirmSignIn(email, code, session);
@@ -111,20 +117,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const authData = response.data;
                 if (!authData.email || !authData.accessToken) throw new Error('No access token received');
 
-                const user = { email: authData.email, accessToken: authData.accessToken };
+                const user = { email: authData.email };
                 setUser(user);
 
-                // Persist user in localStorage
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                // Persist user in cookies
+                setCookie('currentUser', JSON.stringify(user), 1);
 
                 // Clear pending data
-                sessionStorage.removeItem('pendingEmail');
-                sessionStorage.removeItem('pendingSession');
+                removeSessionStorage('pendingEmail');
+                removeSessionStorage('pendingSession');
+                deleteCookie('pendingEmail');
 
                 // Set accessToken cookie for middleware
-                document.cookie = `accessToken=${encodeURIComponent(authData.accessToken)}; path=/; SameSite=Lax`;
-                // Clear cookie
-                document.cookie = 'pendingEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                // setCookie('accessToken', authData.accessToken, 1);
             }
         } catch (err) {
             handleError(err);
