@@ -41,6 +41,7 @@ FROM base AS dev
 ENV NODE_ENV=development
 
 COPY --from=deps-dev /app/node_modules ./node_modules
+COPY --from=deps-dev /root/.cache/ms-playwright /root/.cache/ms-playwright
 COPY . .
 
 RUN chmod +x ./entrypoint.sh
@@ -57,6 +58,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 appuser
 
 COPY --from=deps-prod /app/node_modules ./node_modules
+COPY --from=deps-dev /root/.cache/ms-playwright /root/.cache/ms-playwright
 COPY package*.json ./
 COPY entrypoint.sh ./
 COPY prisma ./prisma
