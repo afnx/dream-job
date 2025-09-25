@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-  netcat-openbsd openssl \
+  netcat-openbsd openssl curl \
   libglib2.0-0 libnspr4 libnss3 \
   libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
   libexpat1 libxcb1 libxkbcommon0 libatspi2.0-0 libx11-6 libxcomposite1 \
