@@ -16,6 +16,7 @@ module.exports = {
     // Backend Configuration
     port: envVars.NODE_PORT,
     host: envVars.NODE_HOST,
+    domain: envVars.DOMAIN,
     apiPrefix: envVars.NODE_API_PREFIX,
     apiVersion: envVars.NODE_API_VERSION,
     apiBaseUrl: envVars.NODE_API_BASE_URL,

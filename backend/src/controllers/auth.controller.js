@@ -22,12 +22,13 @@ exports.confirmSignIn = async (req, res, next) => {
         const authClient = authService.getAuthClient();
 
         const result = await authClient.confirmSignIn(email, code, session);
-
         res.cookie('accessToken', result.accessToken, {
             httpOnly: true,
             secure: env.env === 'prod',
-            sameSite: 'none',
+            sameSite: env.env === 'prod' ? 'none' : 'lax',
             maxAge: 24 * 60 * 60 * 1000, // 1 day
+            path: '/',
+            domain: env.domain,
         });
 
         success(res, result, 'Sign-in confirmed!');
@@ -47,7 +48,9 @@ exports.signOut = async (req, res, next) => {
         res.clearCookie('accessToken', {
             httpOnly: true,
             secure: env.env === 'prod',
-            sameSite: 'none',
+            sameSite: env.env === 'prod' ? 'none' : 'lax',
+            path: '/',
+            domain: env.domain,
         });
 
         success(res, result, 'Sign-out successful!');
