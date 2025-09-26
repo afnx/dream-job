@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Logo from '@/components/Logo';
 import FilledButton from '@/components/FilledButton';
+import { getSessionStorage } from '@/utils/storage';
 
 export default function SignInPage() {
     const [error, setError] = useState<string | null>(null);
@@ -16,7 +17,7 @@ export default function SignInPage() {
     useEffect(() => {
         // If signIn was successful, pendingEmail will be set
         if (typeof window !== 'undefined') {
-            const pendingEmail = sessionStorage.getItem('pendingEmail');
+            const pendingEmail = getSessionStorage('pendingEmail');
             if (pendingEmail) {
                 router.replace('/verify-email');
             }
@@ -44,7 +45,7 @@ export default function SignInPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="min-h-screen flex items-center justify-center gradient-bg-accent">
             <form
                 onSubmit={handleSubmit}
                 className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-1 border-gray-100 shadow-lg"
@@ -69,7 +70,7 @@ export default function SignInPage() {
                     isDisabled={!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
                 />
                 {(error || authError) && (
-                    <div className="text-red-500 bg-red-50 rounded-lg py-2 px-4 text-center text-[0.95rem]">
+                    <div className="text-red-500 bg-red-50 rounded-lg py-4 px-4 text-center text-[0.95rem]">
                         {error || authError}
                     </div>
                 )}

@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Logo from '@/components/Logo';
 import FilledButton from '@/components/FilledButton';
+import { getCookie, removeSessionStorage, deleteCookie } from '@/utils/storage';
 
 export default function VerifyEmailPage() {
     const { currentUser, confirmSignIn, authLoading, authError } = useAuth();
@@ -15,7 +16,7 @@ export default function VerifyEmailPage() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const pendingEmail = sessionStorage.getItem('pendingEmail') || '';
+            const pendingEmail = getCookie('pendingEmail');
             if (!pendingEmail) {
                 router.replace('/sign-in');
             } else {
@@ -26,7 +27,7 @@ export default function VerifyEmailPage() {
 
     useEffect(() => {
         // If signed in, redirect to main app
-        if (currentUser && currentUser.accessToken) {
+        if (currentUser?.email) {
             router.replace('/search');
         }
     }, [currentUser, router]);
@@ -79,7 +80,7 @@ export default function VerifyEmailPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="min-h-screen flex items-center justify-center gradient-bg-accent">
             <form
                 onSubmit={handleSubmit}
                 className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-1 border-gray-100 shadow-lg"
@@ -128,10 +129,9 @@ export default function VerifyEmailPage() {
                     type="button"
                     className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 hover:underline text-sm mt-2 mb-1 transition-colors cursor-pointer mx-auto"
                     onClick={() => {
-                        sessionStorage.removeItem('pendingEmail');
-                        sessionStorage.removeItem('pendingSession');
-                        sessionStorage.clear();
-                        document.cookie = 'pendingEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                        removeSessionStorage('pendingEmail');
+                        removeSessionStorage('pendingSession');
+                        deleteCookie('pendingEmail');
                         router.replace('/sign-in');
                     }}
                 >
@@ -148,7 +148,7 @@ export default function VerifyEmailPage() {
                 </button>
 
                 {(authError) && (
-                    <div className="text-red-500 bg-red-50 rounded-lg py-2 px-4 text-center text-[0.95rem]">
+                    <div className="text-red-500 bg-red-50 rounded-lg py-4 px-4 text-center text-[0.95rem]">
                         {authError}
                     </div>
                 )}

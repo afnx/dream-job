@@ -16,6 +16,7 @@ module.exports = {
     // Backend Configuration
     port: envVars.NODE_PORT,
     host: envVars.NODE_HOST,
+    domain: envVars.DOMAIN,
     apiPrefix: envVars.NODE_API_PREFIX,
     apiVersion: envVars.NODE_API_VERSION,
     apiBaseUrl: envVars.NODE_API_BASE_URL,
@@ -53,5 +54,15 @@ module.exports = {
             clientSecret: envVars.COGNITO_AUTH_CLIENT_SECRET,
             region: envVars.COGNITO_AUTH_REGION
         }
+    },
+
+    // Proxy Configuration
+    proxy: {
+        enabled: envVars.PROXY_ENABLED === 'true',
+        host: envVars.PROXY_HOST,
+        port: parseInt(envVars.PROXY_PORT),
+        username: envVars.PROXY_USERNAME,
+        password: envVars.PROXY_PASSWORD,
+        bypass: envVars.PROXY_BYPASS
     }
 };

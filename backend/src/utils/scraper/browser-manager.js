@@ -19,9 +19,9 @@ chromium.use(stealth);
  * @function
  * @returns {Promise<import('playwright').Browser>} The singleton Chromium browser instance.
  */
-async function getBrowser() {
+async function getBrowser(proxy = {}) {
     if (!browserInstance) {
-        browserInstance = await chromium.launch({
+        const launchOptions = {
             headless: true,
             args: [
                 '--no-sandbox',
@@ -32,8 +32,23 @@ async function getBrowser() {
                 '--disable-gpu',
                 '--disable-features=IsolateOrigins,site-per-process',
                 '--start-maximized',
+                '--ignore-certificate-errors'
             ]
-        });
+        };
+
+        if (proxy.server) {
+            launchOptions.proxy = {
+                server: proxy.server,
+                username: proxy.username,
+                password: proxy.password,
+            };
+
+            if (proxy.bypass) {
+                launchOptions.proxy.bypass = proxy.bypass;
+            }
+        }
+
+        browserInstance = await chromium.launch(launchOptions);
     }
     return browserInstance;
 }

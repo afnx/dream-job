@@ -184,10 +184,12 @@ class JobRepository extends BaseRepository {
 
         const buildConditions = (relaxed = false) => [
             keywords?.length ? {
-                OR: searchTerms.flatMap(term => [
-                    { title: { contains: term, mode: 'insensitive' } },
-                    { description: { contains: term, mode: 'insensitive' } }
-                ])
+                AND: searchTerms.map(term => ({
+                    OR: [
+                        { title: { contains: term, mode: 'insensitive' } },
+                        { description: { contains: term, mode: 'insensitive' } }
+                    ]
+                }))
             } : null,
             location ? { location: { contains: location, mode: 'insensitive' } } : null,
             !relaxed && remoteOption ? {
@@ -224,6 +226,18 @@ class JobRepository extends BaseRepository {
         // If no results, relax filters
         if (results.length === 0) {
             results = await this.findMany({ AND: buildConditions(true) }, { ...options, ...includeCompany });
+        }
+
+        // Post-filter for exact word matches
+        if (searchTerms.length) {
+            results = results.filter(job => {
+                const titleWords = (job.title || '').toLowerCase().split(/\W+/);
+                const descWords = (job.description || '').toLowerCase().split(/\W+/);
+                return searchTerms.every(term => {
+                    const lowerTerm = term.toLowerCase();
+                    return titleWords.includes(lowerTerm) || descWords.includes(lowerTerm);
+                });
+            });
         }
 
         return results;
