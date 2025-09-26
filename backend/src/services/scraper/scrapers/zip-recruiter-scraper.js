@@ -9,6 +9,7 @@ const { parseRelativeDate } = require('../../../utils/scraper/extractors/date-ex
 const { extractSalary, extractJobType, determineRemoteOption } = require('../../../utils/scraper/extractors/text-extractors');
 const { extractText, extractHTML, extractLink, findTextByCondition } = require('../../../utils/scraper/extractors/content-extractors');
 const { injectPageUtilities } = require('../../../utils/scraper/core/page-utils');
+const config = require('../../../config/env');
 
 
 /**
@@ -59,7 +60,17 @@ class ZipRecruiterScraper extends BaseScraper {
      * @throws {ScraperServiceError} Throws if scraping fails or an internal error occurs.
      */
     async scrape(query) {
-        const browser = await getBrowser();
+        // Configure proxy settings if enabled
+        const proxy = config.proxy.enabled
+            ? {
+                server: `${config.proxy.host}:${config.proxy.port}`,
+                username: config.proxy.username,
+                password: config.proxy.password,
+                bypass: config.proxy.bypass
+            }
+            : {};
+
+        const browser = await getBrowser(proxy);
         let context;
 
         try {

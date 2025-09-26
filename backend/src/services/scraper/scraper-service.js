@@ -1,5 +1,4 @@
 const { ERROR_TYPES, ScraperServiceError } = require('../../utils/errors');
-const env = require('../../config/env');
 
 /**
  * Service class for managing scraper modules.
@@ -39,9 +38,7 @@ class ScraperService {
                 const jobs = await scraper.scrape(query);
                 results.push(...jobs);
             } catch (err) {
-                if (env.env === 'dev') {
-                    console.error(`Error scraping with ${scraperName}: ${err.message}`);
-                }
+                console.error(`Error scraping with ${scraperName}: ${err.message}`);
             }
         }
 
