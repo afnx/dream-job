@@ -154,7 +154,7 @@ class ZipRecruiterAdapter extends BaseSiteAdapter {
     }
 
     async waitForJobElements() {
-        return this.page.waitForSelector(this.selectors.jobCards, { timeout: 15000 });
+        return this.page.waitForSelector(this.selectors.jobCards, { timeout: 30000 });
     }
 
     async getJobElementIds() {
