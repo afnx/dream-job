@@ -7,7 +7,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --gradient-bg:
+  --gradient-bg: linear-gradient(to bottom right, #f9fafb, #ffffff, #f3e8ff);
+  --gradient-bg-accent:
     radial-gradient(circle at 20% 30%, #e0c3fc 0%, transparent 60%),
     radial-gradient(circle at 80% 70%, #8ec5fc 0%, transparent 60%);
 }
@@ -35,6 +36,10 @@ body {
 
 .gradient-bg {
   background-image: var(--gradient-bg);
+}
+
+.gradient-bg-accent {
+  background-image: var(--gradient-bg-accent);
 }
 
 .line-clamp-3 {

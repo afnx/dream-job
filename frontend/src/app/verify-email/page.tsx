@@ -80,7 +80,7 @@ export default function VerifyEmailPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="min-h-screen flex items-center justify-center gradient-bg-accent">
             <form
                 onSubmit={handleSubmit}
                 className="text-center m-2 bg-white p-16 px-8 rounded-xl min-w-[320px] sm:min-w-[420px] w-full max-w-md flex flex-col gap-5 border-1 border-gray-100 shadow-lg"
