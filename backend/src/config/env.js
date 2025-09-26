@@ -54,5 +54,15 @@ module.exports = {
             clientSecret: envVars.COGNITO_AUTH_CLIENT_SECRET,
             region: envVars.COGNITO_AUTH_REGION
         }
+    },
+
+    // Proxy Configuration
+    proxy: {
+        enabled: envVars.PROXY_ENABLED === 'true',
+        host: envVars.PROXY_HOST,
+        port: parseInt(envVars.PROXY_PORT),
+        username: envVars.PROXY_USERNAME,
+        password: envVars.PROXY_PASSWORD,
+        bypass: envVars.PROXY_BYPASS
     }
 };
