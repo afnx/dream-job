@@ -68,6 +68,8 @@ Before you begin, ensure you have the following installed:
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
 - AI Provider API key
+- Auth Provider (Optional)
+- Proxy Provider (Optional but recommended)
 
 ## Quick Start
 
@@ -91,6 +93,7 @@ Edit the `.env` file with your configuration:
 ```bash
 # Project Configuration
 ENV=dev
+DOMAIN=localhost
 
 # Backend Configuration
 NODE_PORT=5000
@@ -104,7 +107,6 @@ DATABASE_PORT=5432
 DATABASE_USER=postgres_user
 DATABASE_PASSWORD=postgres_password
 DATABASE_NAME=dream_job_db
-DATABASE_URL="postgresql://postgres_user:postgres_password@db:5432/dream_job_db?schema=public"
 
 # AI Configuration
 AI_PROVIDER=openai
@@ -114,6 +116,21 @@ AI_MODEL=gpt-3.5-turbo
 # Frontend Configuration
 NEXT_JS_PORT=3000
 NEXT_JS_HOST=localhost
+
+# Auth Configuration
+AUTH_PROVIDER=cognito
+COGNITO_AUTH_USER_POOL_ID=your_user_pool_id
+COGNITO_AUTH_CLIENT_ID=your_client_id
+COGNITO_AUTH_CLIENT_SECRET=your_client_secret
+COGNITO_AUTH_REGION=your_region
+
+# Proxy Configuration
+PROXY_ENABLED=true
+PROXY_HOST=localhost
+PROXY_PORT=8080
+PROXY_USERNAME=your_proxy_username
+PROXY_PASSWORD=your_proxy_password
+PROXY_BYPASS=localhost,127.0.0.1
 ```
 
 ### 3. Docker Setup
@@ -176,32 +193,6 @@ npx prisma studio
 | **Frontend** | `npm test` | Run all frontend tests |
 | **Coverage** | `npm run test:coverage` | Generate coverage report |
 | **Watch** | `npm run test:watch` | Run tests in watch mode |
-
-## Project Structure
-
-```
-dream-job/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/      # Route controllers
-│   │   ├── services/         # Business logic
-│   │   │   ├── ai/           # AI service implementations
-│   │   │   ├── scraper/      # Web scraping services
-│   │   │   └── job/          # Job-related services
-│   │   ├── repositories/     # Data access layer
-│   │   ├── utils/            # Utility functions
-│   │   ├── middleware/       # Express middleware
-│   │   └── routes/           # API routes
-│   ├── __tests__/            # Test files
-│   └── prisma/               # Database schema & migrations
-├── frontend/
-│   ├── src/
-│   │   ├── app/              # Next.js app directory
-│   │   ├── components/       # React components
-│   │   └── hooks/            # Custom React hooks
-│   └── public/               # Static assets
-└── compose.yaml              # Container orchestration
-```
 
 ## Supported Platforms
 
