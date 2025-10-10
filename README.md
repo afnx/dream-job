@@ -18,6 +18,8 @@
 
 ---
 
+Dream Job is an AI-powered job search tool that helps users quickly find relevant employment opportunities. Built mostly with JavaScript and TypeScript, it uses intelligent matching to streamline the job hunt.
+
 ## Features
 
 <table>
