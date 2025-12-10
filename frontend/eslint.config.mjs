@@ -1,15 +1,16 @@
-import js from '@eslint/js'
-import { FlatCompat } from '@eslint/eslintrc'
+import { defineConfig, globalIgnores } from 'eslint/config'
+import nextVitals from 'eslint-config-next/core-web-vitals'
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-  recommendedConfig: js.configs.recommended,
-})
-
-const eslintConfig = [
-  ...compat.config({
-    extends: ['eslint:recommended', 'next'],
-  }),
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+  ]),
   {
     languageOptions: {
       globals: {
@@ -52,8 +53,9 @@ const eslintConfig = [
       '@next/next/no-title-in-document-head': 'error',
       '@next/next/no-typos': 'error',
       '@next/next/no-unwanted-polyfillio': 'error',
+      'react-hooks/set-state-in-effect': 'off', // TODO: enable this after fixing existing issues
     },
   },
-]
+])
 
 export default eslintConfig
