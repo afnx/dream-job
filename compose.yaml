@@ -33,7 +33,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
     env_file:
       - .env
 
